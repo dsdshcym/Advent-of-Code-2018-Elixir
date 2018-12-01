@@ -1,15 +1,10 @@
 defmodule Calibration do
   def sum(changes) do
     changes
-    |> Enum.map(&String.to_integer/1)
     |> Enum.sum()
   end
 
   def first_repeat(changes) do
-    changes =
-      changes
-      |> Enum.map(&String.to_integer/1)
-
     find_first_repeat(0, MapSet.new(), changes, [])
   end
 
@@ -1084,6 +1079,7 @@ defmodule CalibrationTest do
 
       assert input
              |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_integer/1)
              |> Calibration.sum() == 3
     end
 
@@ -1096,6 +1092,7 @@ defmodule CalibrationTest do
 
       assert input
              |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_integer/1)
              |> Calibration.sum() == 0
     end
 
@@ -1108,12 +1105,14 @@ defmodule CalibrationTest do
 
       assert input
              |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_integer/1)
              |> Calibration.sum() == -6
     end
 
     test "puzzle input" do
       assert @input
              |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_integer/1)
              |> Calibration.sum() == 580
     end
   end
@@ -1127,12 +1126,14 @@ defmodule CalibrationTest do
 
       assert input
              |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_integer/1)
              |> Calibration.first_repeat() == 0
     end
 
     test "puzzle input" do
       assert @input
              |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_integer/1)
              |> Calibration.first_repeat() == 81972
     end
   end
