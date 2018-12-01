@@ -1077,10 +1077,7 @@ defmodule CalibrationTest do
       +1
       """
 
-      assert input
-             |> String.split("\n", trim: true)
-             |> Enum.map(&String.to_integer/1)
-             |> Calibration.sum() == 3
+      assert sum(input) == 3
     end
 
     test "+1, +1, -2" do
@@ -1090,10 +1087,7 @@ defmodule CalibrationTest do
       -2
       """
 
-      assert input
-             |> String.split("\n", trim: true)
-             |> Enum.map(&String.to_integer/1)
-             |> Calibration.sum() == 0
+      assert sum(input) == 0
     end
 
     test "-1, -2, -3" do
@@ -1103,17 +1097,11 @@ defmodule CalibrationTest do
       -3
       """
 
-      assert input
-             |> String.split("\n", trim: true)
-             |> Enum.map(&String.to_integer/1)
-             |> Calibration.sum() == -6
+      assert sum(input) == -6
     end
 
     test "puzzle input" do
-      assert @input
-             |> String.split("\n", trim: true)
-             |> Enum.map(&String.to_integer/1)
-             |> Calibration.sum() == 580
+      assert sum(@input) == 580
     end
   end
 
@@ -1124,17 +1112,25 @@ defmodule CalibrationTest do
       -1
       """
 
-      assert input
-             |> String.split("\n", trim: true)
-             |> Enum.map(&String.to_integer/1)
-             |> Calibration.first_repeat() == 0
+      assert first_repeat(input) == 0
     end
 
     test "puzzle input" do
-      assert @input
-             |> String.split("\n", trim: true)
-             |> Enum.map(&String.to_integer/1)
-             |> Calibration.first_repeat() == 81972
+      assert first_repeat(@input) == 81972
     end
+  end
+
+  defp sum(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> Calibration.sum()
+  end
+
+  defp first_repeat(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> Calibration.first_repeat()
   end
 end
