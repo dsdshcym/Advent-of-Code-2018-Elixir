@@ -1,25 +1,15 @@
 defmodule Inventory do
   def checksum(ids) do
-    containing_two_same_letters(ids) * containing_three_same_letters(ids)
+    containing_same_letters_count(ids, 2) * containing_same_letters_count(ids, 3)
   end
 
-  defp containing_two_same_letters(ids) do
+  defp containing_same_letters_count(ids, same_letters_num) do
     ids
     |> Enum.count(fn
       id ->
         id
         |> Enum.group_by(& &1)
-        |> Enum.any?(fn {_, letters} -> length(letters) == 2 end)
-    end)
-  end
-
-  defp containing_three_same_letters(ids) do
-    ids
-    |> Enum.count(fn
-      id ->
-        id
-        |> Enum.group_by(& &1)
-        |> Enum.any?(fn {_, letters} -> length(letters) == 3 end)
+        |> Enum.any?(fn {_, letters} -> length(letters) == same_letters_num end)
     end)
   end
 end
