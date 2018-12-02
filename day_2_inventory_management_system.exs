@@ -14,23 +14,26 @@ defmodule Inventory do
   end
 
   def common_letters(ids) do
-    combinations =
-      for id_a <- ids, id_b <- ids do
-        {id_a, id_b}
-      end
+    ids
+    |> correct_ids()
+    |> get_common_letters()
+  end
 
-    {correct_id_a, correct_id_b} =
-      combinations
-      |> Enum.find(fn
-        {id_a, id_b} ->
-          Enum.zip(id_a, id_b)
-          |> Enum.count(fn
-            {char_a, char_b} -> char_a != char_b
-          end)
-          |> Kernel.==(1)
-      end)
+  defp correct_ids(ids) do
+    for id_a <- ids,
+        id_b <- ids,
+        1 == char_distance(id_a, id_b) do
+      {id_a, id_b}
+    end
+    |> hd()
+  end
 
-    Enum.zip(correct_id_a, correct_id_b)
+  defp char_distance(id_a, id_b) do
+    Enum.zip(id_a, id_b) |> Enum.count(fn {char_a, char_b} -> char_a != char_b end)
+  end
+
+  defp get_common_letters({id_a, id_b}) do
+    Enum.zip(id_a, id_b)
     |> Enum.filter(fn {a, b} -> a == b end)
     |> Enum.map(fn {a, a} -> a end)
   end
