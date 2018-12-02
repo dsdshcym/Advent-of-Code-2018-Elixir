@@ -12,6 +12,28 @@ defmodule Inventory do
         |> Enum.any?(fn {_, letters} -> length(letters) == same_letters_num end)
     end)
   end
+
+  def common_letters(ids) do
+    combinations =
+      for id_a <- ids, id_b <- ids do
+        {id_a, id_b}
+      end
+
+    {correct_id_a, correct_id_b} =
+      combinations
+      |> Enum.find(fn
+        {id_a, id_b} ->
+          Enum.zip(id_a, id_b)
+          |> Enum.count(fn
+            {char_a, char_b} -> char_a != char_b
+          end)
+          |> Kernel.==(1)
+      end)
+
+    Enum.zip(correct_id_a, correct_id_b)
+    |> Enum.filter(fn {a, b} -> a == b end)
+    |> Enum.map(fn {a, a} -> a end)
+  end
 end
 
 ExUnit.start()
@@ -295,6 +317,32 @@ defmodule InventoryTest do
              |> String.split("\n", trim: true)
              |> Enum.map(&String.to_charlist/1)
              |> Inventory.checksum() == 6422
+    end
+  end
+
+  describe "common_letters" do
+    test "example" do
+      input = """
+      abcde
+      fghij
+      klmno
+      pqrst
+      fguij
+      axcye
+      wvxyz
+      """
+
+      assert input
+             |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_charlist/1)
+             |> Inventory.common_letters() == 'fgij'
+    end
+
+    test "puzzle input" do
+      assert @input
+             |> String.split("\n", trim: true)
+             |> Enum.map(&String.to_charlist/1)
+             |> Inventory.common_letters() == 'qcslyvphgkrmdawljuefotxbh'
     end
   end
 end
