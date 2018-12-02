@@ -5,21 +5,18 @@ defmodule Calibration do
   end
 
   def first_repeat(changes) do
-    find_first_repeat(0, MapSet.new(), changes, [])
-  end
+    changes
+    |> Stream.cycle()
+    |> Enum.reduce_while({0, MapSet.new([0])}, fn
+      change, {current, seen} ->
+        new_freq = current + change
 
-  defp find_first_repeat(frequency, frequencies, [], applied_changes) do
-    find_first_repeat(frequency, frequencies, Enum.reverse(applied_changes), [])
-  end
-
-  defp find_first_repeat(frequency, frequencies, [change | tail], applied_changes) do
-    if MapSet.member?(frequencies, frequency) do
-      frequency
-    else
-      find_first_repeat(frequency + change, MapSet.put(frequencies, frequency), tail, [
-        change | applied_changes
-      ])
-    end
+        if MapSet.member?(seen, new_freq) do
+          {:halt, new_freq}
+        else
+          {:cont, {new_freq, MapSet.put(seen, new_freq)}}
+        end
+    end)
   end
 end
 
