@@ -21,7 +21,7 @@ defmodule Fabric do
   def overlap_size(inputs) do
     inputs
     |> String.split("\n", trim: true)
-    |> Enum.map(&parse_line/1)
+    |> Enum.map(&parse_each_line_to_a_claim/1)
     |> Enum.reduce(%{}, fn
       claim, fabric ->
         claim_area(fabric, claim)
@@ -29,7 +29,7 @@ defmodule Fabric do
     |> Enum.count(fn {_point, claimed_times} -> claimed_times >= 2 end)
   end
 
-  defp parse_line(line) do
+  defp parse_each_line_to_a_claim(line) do
     Regex.named_captures(
       ~r/#(?<id>[0-9]+) @ (?<x>[0-9]+),(?<y>[0-9]+): (?<width>[0-9]+)x(?<height>[0-9]+)/,
       line
