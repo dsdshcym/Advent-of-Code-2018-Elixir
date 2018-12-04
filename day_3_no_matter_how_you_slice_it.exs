@@ -3,24 +3,20 @@ defmodule Fabric do
     inputs
     |> String.split("\n", trim: true)
     |> Enum.map(&parse_line/1)
-    |> Map.new()
     |> Enum.reduce(%{}, fn
-      {_id, claim}, fabric ->
+      claim, fabric ->
         claim_area(fabric, claim)
     end)
     |> Enum.count(fn {_point, claimed_times} -> claimed_times >= 2 end)
   end
 
   defp parse_line(line) do
-    attributes =
-      Regex.named_captures(
-        ~r/#(?<id>[0-9]+) @ (?<x>[0-9]+),(?<y>[0-9]+): (?<width>[0-9]+)x(?<height>[0-9]+)/,
-        line
-      )
-      |> Enum.map(fn {key, value} -> {String.to_atom(key), String.to_integer(value)} end)
-      |> Map.new()
-
-    {attributes[:id], attributes}
+    Regex.named_captures(
+      ~r/#(?<id>[0-9]+) @ (?<x>[0-9]+),(?<y>[0-9]+): (?<width>[0-9]+)x(?<height>[0-9]+)/,
+      line
+    )
+    |> Enum.map(fn {key, value} -> {String.to_atom(key), String.to_integer(value)} end)
+    |> Map.new()
   end
 
   defp claim_area(fabric, claim) do
