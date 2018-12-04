@@ -1,3 +1,22 @@
+defmodule Claim do
+  def new(options) do
+    %{
+      id: options[:id],
+      x: options[:x],
+      y: options[:y],
+      width: options[:width],
+      height: options[:height]
+    }
+  end
+
+  def all_points(claim) do
+    for x <- claim.x..(claim.x + claim.width - 1),
+        y <- claim.y..(claim.y + claim.height - 1) do
+      {x, y}
+    end
+  end
+end
+
 defmodule Fabric do
   def overlap_size(inputs) do
     inputs
@@ -16,14 +35,12 @@ defmodule Fabric do
       line
     )
     |> Enum.map(fn {key, value} -> {String.to_atom(key), String.to_integer(value)} end)
-    |> Map.new()
+    |> Claim.new()
   end
 
   defp claim_area(fabric, claim) do
-    for x <- claim.x..(claim.x + claim.width - 1),
-        y <- claim.y..(claim.y + claim.height - 1) do
-      {x, y}
-    end
+    claim
+    |> Claim.all_points()
     |> Enum.reduce(fabric, fn point, fabric ->
       Map.update(fabric, point, 1, &(&1 + 1))
     end)
