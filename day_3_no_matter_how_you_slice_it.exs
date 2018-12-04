@@ -79,7 +79,7 @@ defmodule Fabric do
   end
 
   defp digits(name) do
-    "(?<#{name}>[0-9]+)"
+    "(?<#{name}>[[:digit:]]+)"
   end
 end
 
