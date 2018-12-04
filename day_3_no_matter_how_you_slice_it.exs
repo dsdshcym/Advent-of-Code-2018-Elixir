@@ -15,6 +15,22 @@ defmodule Claim do
       {x, y}
     end
   end
+
+  def overlap?(claim1, claim2) do
+    line_overlap?(
+      {claim1.x, claim1.x + claim1.width - 1},
+      {claim2.x, claim2.x + claim2.width - 1}
+    ) &&
+      line_overlap?(
+        {claim1.y, claim1.y + claim1.height - 1},
+        {claim2.y, claim2.y + claim2.height - 1}
+      )
+  end
+
+  defp line_overlap?({a1, b1}, {a2, b2}) do
+    (a1 <= a2 && a2 <= b1 && b1 <= b2) || (a2 <= a1 && a1 <= b2 && b2 <= b1) ||
+      (a1 <= a2 && a2 <= b2 && b2 <= b1) || (a2 <= a1 && a1 <= b1 && b1 <= b2)
+  end
 end
 
 defmodule Fabric do
@@ -27,6 +43,22 @@ defmodule Fabric do
         claim_area(fabric, claim)
     end)
     |> Enum.count(fn {_point, claimed_times} -> claimed_times >= 2 end)
+  end
+
+  def no_overlap(inputs) do
+    claims =
+      inputs
+      |> String.split("\n", trim: true)
+      |> Enum.map(&parse_each_line_to_a_claim/1)
+
+    claims
+    |> Enum.find(fn claim ->
+      Enum.all?(claims, fn
+        ^claim -> true
+        other_claim -> !Claim.overlap?(claim, other_claim)
+      end)
+    end)
+    |> Map.get(:id)
   end
 
   defp parse_each_line_to_a_claim(line) do
@@ -103,6 +135,27 @@ defmodule FabricTest do
     test "puzzle input" do
       assert File.read!("./fixtures/day_3.txt")
              |> Fabric.overlap_size() == 120_419
+    end
+  end
+
+  describe "no_overlap/1" do
+    test ~S(
+    .11xx3..
+    .11xx3..
+    .111122.
+    .111122.
+    ) do
+      assert """
+             #1 @ 0,1: 4x4
+             #2 @ 5,2: 2x2
+             #3 @ 3,0: 3x2
+             """
+             |> Fabric.no_overlap() == 2
+    end
+
+    test "puzzle input" do
+      assert File.read!("./fixtures/day_3.txt")
+             |> Fabric.no_overlap() == 445
     end
   end
 end
