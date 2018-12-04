@@ -63,7 +63,7 @@ defmodule Fabric do
 
   defp parse_each_line_to_a_claim(line) do
     Regex.named_captures(
-      ~r/#(?<id>[0-9]+) @ (?<x>[0-9]+),(?<y>[0-9]+): (?<width>[0-9]+)x(?<height>[0-9]+)/,
+      ~r/#{digits("id")} @ #{digits("x")},#{digits("y")}: #{digits("width")}x#{digits("height")}/,
       line
     )
     |> Enum.map(fn {key, value} -> {String.to_atom(key), String.to_integer(value)} end)
@@ -76,6 +76,10 @@ defmodule Fabric do
     |> Enum.reduce(fabric, fn point, fabric ->
       Map.update(fabric, point, 1, &(&1 + 1))
     end)
+  end
+
+  defp digits(name) do
+    "(?<#{name}>[0-9]+)"
   end
 end
 
