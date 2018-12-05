@@ -103,19 +103,12 @@ defmodule GuardRecords do
   end
 
   def choose_minute(records, guard) do
-    sleep_records = records[guard]
+    {{^guard, minute}, _max_count} =
+      {guard, records[guard]}
+      |> guard_sleep_distribution()
+      |> Enum.max_by(fn {_, counts} -> counts end)
 
-    sleep_counts_by_minute =
-      sleep_records
-      |> Enum.reduce(%{}, fn {started_at, ended_at}, counts ->
-        Enum.reduce(started_at..ended_at, counts, fn minute, counts ->
-          Map.update(counts, minute, 1, &(&1 + 1))
-        end)
-      end)
-
-    sleep_counts_by_minute
-    |> Enum.max_by(fn {_minute, counts} -> counts end)
-    |> elem(0)
+    minute
   end
 
   def guard_and_minute_slept_most_frequently(records) do
