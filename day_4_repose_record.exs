@@ -117,6 +117,23 @@ defmodule GuardRecords do
     |> Enum.max_by(fn {_minute, counts} -> counts end)
     |> elem(0)
   end
+
+  def guard_and_minute_slept_most_frequently(records) do
+    records
+    |> Enum.map(&guard_sleep_distribution/1)
+    |> Enum.reduce(%{}, &Map.merge/2)
+    |> Enum.max_by(fn {_, counts} -> counts end)
+    |> elem(0)
+  end
+
+  defp guard_sleep_distribution({guard_id, sleep_records}) do
+    sleep_records
+    |> Enum.reduce(%{}, fn {started_at, ended_at}, counts ->
+      Enum.reduce(started_at..ended_at, counts, fn minute, counts ->
+        Map.update(counts, {guard_id, minute}, 1, &(&1 + 1))
+      end)
+    end)
+  end
 end
 
 ExUnit.start()
@@ -204,6 +221,26 @@ defmodule GuardRecordsTest do
       records = %{3 => [{00, 10}, {5, 11}, {10, 12}]}
 
       assert GuardRecords.choose_minute(records, 3) == 10
+    end
+  end
+
+  describe "part 2" do
+    test "puzzle input" do
+      puzzle_input = File.read!("./fixtures/day_4.txt")
+
+      records = GuardRecords.new(puzzle_input)
+
+      {guard, minute} = GuardRecords.guard_and_minute_slept_most_frequently(records)
+
+      assert guard * minute == 78990
+    end
+  end
+
+  describe "guard_and_minute_slept_most_frequently/1" do
+    test "example" do
+      records = %{10 => [{24, 28}, {30, 54}, {5, 24}], 99 => [{45, 54}, {36, 45}, {40, 49}]}
+
+      assert GuardRecords.guard_and_minute_slept_most_frequently(records) == {99, 45}
     end
   end
 end
