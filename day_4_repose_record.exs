@@ -5,6 +5,10 @@ defmodule FrequencyMap do
     %FrequencyMap{}
   end
 
+  def most_frequent(frequency_map) do
+    Enum.max_by(frequency_map.data, fn {_, count} -> count end)
+  end
+
   defimpl Collectable do
     def into(%FrequencyMap{data: data}) do
       collector_fun = fn
@@ -128,7 +132,7 @@ defmodule GuardRecords do
     {{^guard, minute}, _max_count} =
       {guard, records[guard]}
       |> guard_sleep_distribution()
-      |> Enum.max_by(fn {_, counts} -> counts end)
+      |> FrequencyMap.most_frequent()
 
     minute
   end
@@ -136,20 +140,16 @@ defmodule GuardRecords do
   def guard_and_minute_slept_most_frequently(records) do
     {{guard_id, minute}, _} =
       records
-      |> Enum.map(&guard_sleep_distribution/1)
-      |> Enum.reduce(%{}, &Map.merge/2)
-      |> Enum.max_by(fn {_, counts} -> counts end)
+      |> Enum.reduce(FrequencyMap.new(), &guard_sleep_distribution/2)
+      |> FrequencyMap.most_frequent()
 
     {guard_id, minute}
   end
 
-  defp guard_sleep_distribution({guard_id, sleep_records}) do
-    %{data: data} =
-      for sleep_record <- sleep_records, minute <- sleep_record, into: FrequencyMap.new() do
-        {guard_id, minute}
-      end
-
-    data
+  defp guard_sleep_distribution({guard_id, sleep_records}, frequency_map \\ FrequencyMap.new()) do
+    for sleep_record <- sleep_records, minute <- sleep_record, into: frequency_map do
+      {guard_id, minute}
+    end
   end
 end
 
