@@ -1,3 +1,23 @@
+defmodule FrequencyMap do
+  defstruct data: %{}
+
+  def new do
+    %FrequencyMap{}
+  end
+
+  defimpl Collectable do
+    def into(%FrequencyMap{data: data}) do
+      collector_fun = fn
+        data, {:cont, elem} -> Map.update(data, elem, 1, &(&1 + 1))
+        data, :done -> %FrequencyMap{data: data}
+        _set, :halt -> :ok
+      end
+
+      {data, collector_fun}
+    end
+  end
+end
+
 defmodule GuardRecords do
   def new(inputs) do
     inputs
@@ -124,12 +144,12 @@ defmodule GuardRecords do
   end
 
   defp guard_sleep_distribution({guard_id, sleep_records}) do
-    sleep_records
-    |> Enum.reduce(%{}, fn sleep_record, counts ->
-      Enum.reduce(sleep_record, counts, fn minute, counts ->
-        Map.update(counts, {guard_id, minute}, 1, &(&1 + 1))
-      end)
-    end)
+    %{data: data} =
+      for sleep_record <- sleep_records, minute <- sleep_record, into: FrequencyMap.new() do
+        {guard_id, minute}
+      end
+
+    data
   end
 end
 
