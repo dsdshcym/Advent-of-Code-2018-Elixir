@@ -82,12 +82,12 @@ defmodule GuardRecords do
     # Because all asleep/awake times are during the midnight hour
     # (00:00 - 00:59), only the minute portion (00 - 59) is relevant
     # for those events.
-    duration = {sleeps_at.minute, wakes_at.minute - 1}
+    sleep_record = sleeps_at.minute..(wakes_at.minute - 1)
 
     build_records(
       logs_tail,
       current_guard_id,
-      Map.update(records, current_guard_id, [duration], &[duration | &1])
+      Map.update(records, current_guard_id, [sleep_record], &[sleep_record | &1])
     )
   end
 
@@ -97,7 +97,7 @@ defmodule GuardRecords do
       |> Enum.max_by(fn
         {_id, sleep_records} ->
           sleep_records
-          |> Enum.map(fn {started_at, ended_at} -> ended_at - started_at + 1 end)
+          |> Enum.map(&Enum.count/1)
           |> Enum.sum()
       end)
 
@@ -125,8 +125,8 @@ defmodule GuardRecords do
 
   defp guard_sleep_distribution({guard_id, sleep_records}) do
     sleep_records
-    |> Enum.reduce(%{}, fn {started_at, ended_at}, counts ->
-      Enum.reduce(started_at..ended_at, counts, fn minute, counts ->
+    |> Enum.reduce(%{}, fn sleep_record, counts ->
+      Enum.reduce(sleep_record, counts, fn minute, counts ->
         Map.update(counts, {guard_id, minute}, 1, &(&1 + 1))
       end)
     end)
@@ -164,7 +164,7 @@ defmodule GuardRecordsTest do
         [1518-11-01 00:25] wakes up
         """)
 
-      assert record == %{10 => [{05, 24}]}
+      assert record == %{10 => [05..24]}
     end
 
     test "guard starts before 00:00" do
@@ -175,7 +175,7 @@ defmodule GuardRecordsTest do
         [1518-11-02 00:29] wakes up
         """)
 
-      assert record == %{10 => [{16, 28}]}
+      assert record == %{10 => [16..28]}
     end
 
     test "sorts by timestamp before processing" do
@@ -186,7 +186,7 @@ defmodule GuardRecordsTest do
         [1518-11-01 00:00] Guard #10 begins shift
         """)
 
-      assert record == %{10 => [{05, 24}]}
+      assert record == %{10 => [05..24]}
     end
   end
 
@@ -199,8 +199,8 @@ defmodule GuardRecordsTest do
 
     test "returns the id of whom sleeps the most" do
       records = %{
-        1 => [{00, 49}],
-        2 => [{01, 02}]
+        1 => [00..49],
+        2 => [01..02]
       }
 
       assert GuardRecords.guard_sleep_the_most(records) == 1
@@ -209,13 +209,13 @@ defmodule GuardRecordsTest do
 
   describe "choose_minute/2" do
     test "returns the first overlapping minute of two time ranges" do
-      records = %{2 => [{00, 10}, {10, 19}]}
+      records = %{2 => [00..10, 10..19]}
 
       assert GuardRecords.choose_minute(records, 2) == 10
     end
 
     test "returns the most overlapped minute" do
-      records = %{3 => [{00, 10}, {5, 11}, {10, 12}]}
+      records = %{3 => [00..10, 5..11, 10..12]}
 
       assert GuardRecords.choose_minute(records, 3) == 10
     end
@@ -235,7 +235,7 @@ defmodule GuardRecordsTest do
 
   describe "guard_and_minute_slept_most_frequently/1" do
     test "example" do
-      records = %{10 => [{24, 28}, {30, 54}, {5, 24}], 99 => [{45, 54}, {36, 45}, {40, 49}]}
+      records = %{10 => [24..28, 30..54, 5..24], 99 => [45..54, 36..45, 40..49]}
 
       assert GuardRecords.guard_and_minute_slept_most_frequently(records) == {99, 45}
     end
