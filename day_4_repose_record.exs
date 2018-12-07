@@ -92,14 +92,16 @@ defmodule GuardRecords do
   end
 
   def guard_sleep_the_most(records) do
-    records
-    |> Enum.max_by(fn
-      {_id, sleep_records} ->
-        sleep_records
-        |> Enum.map(fn {started_at, ended_at} -> ended_at - started_at + 1 end)
-        |> Enum.sum()
-    end)
-    |> elem(0)
+    {guard_id, _total_asleep_time} =
+      records
+      |> Enum.max_by(fn
+        {_id, sleep_records} ->
+          sleep_records
+          |> Enum.map(fn {started_at, ended_at} -> ended_at - started_at + 1 end)
+          |> Enum.sum()
+      end)
+
+    guard_id
   end
 
   def choose_minute(records, guard) do
@@ -112,11 +114,13 @@ defmodule GuardRecords do
   end
 
   def guard_and_minute_slept_most_frequently(records) do
-    records
-    |> Enum.map(&guard_sleep_distribution/1)
-    |> Enum.reduce(%{}, &Map.merge/2)
-    |> Enum.max_by(fn {_, counts} -> counts end)
-    |> elem(0)
+    {{guard_id, minute}, _} =
+      records
+      |> Enum.map(&guard_sleep_distribution/1)
+      |> Enum.reduce(%{}, &Map.merge/2)
+      |> Enum.max_by(fn {_, counts} -> counts end)
+
+    {guard_id, minute}
   end
 
   defp guard_sleep_distribution({guard_id, sleep_records}) do
