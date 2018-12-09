@@ -1,4 +1,6 @@
 defmodule Alchemical do
+  defguardp react?(c1, c2) when abs(c1 - c2) == ?a - ?A
+
   def reduce_recursively(units) do
     reduced_units = reduce(units)
 
@@ -13,24 +15,16 @@ defmodule Alchemical do
     reduce(units, [])
   end
 
+  defp reduce([c1, c2 | rest], stack) when react?(c1, c2) do
+    Enum.reverse(stack) ++ rest
+  end
+
   defp reduce('', stack) do
     Enum.reverse(stack)
   end
 
-  defp reduce([c], stack) do
-    reduce('', [c | stack])
-  end
-
-  defp reduce([c1, c2 | rest], stack) do
-    if react?(c1, c2) do
-      Enum.reverse(stack) ++ rest
-    else
-      reduce([c2 | rest], [c1 | stack])
-    end
-  end
-
-  defp react?(c1, c2) do
-    abs(c1 - c2) == ?a - ?A
+  defp reduce([c | rest], stack) do
+    reduce(rest, [c | stack])
   end
 end
 
