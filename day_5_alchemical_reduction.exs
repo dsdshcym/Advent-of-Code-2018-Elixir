@@ -1,22 +1,16 @@
 defmodule Alchemical do
   defguardp react?(c1, c2) when abs(c1 - c2) == ?a - ?A
 
-  def reduce_recursively(units) do
-    reduced_units = reduce(units)
-
-    if reduced_units == units do
-      units
-    else
-      reduce_recursively(reduced_units)
-    end
-  end
-
   def reduce(units) do
     reduce(units, [])
   end
 
-  defp reduce([c1, c2 | rest], stack) when react?(c1, c2) do
-    Enum.reverse(stack) ++ rest
+  defp reduce([c1, c2 | rest], []) when react?(c1, c2) do
+    reduce(rest, [])
+  end
+
+  defp reduce([c1, c2 | rest], [pre | stack]) when react?(c1, c2) do
+    reduce([pre | rest], stack)
   end
 
   defp reduce('', stack) do
@@ -32,24 +26,6 @@ ExUnit.start()
 
 defmodule AlchemicalTest do
   use ExUnit.Case
-
-  describe "reduce_recursively/1" do
-    test "reduces recursively" do
-      assert Alchemical.reduce_recursively('aBbA') == ''
-    end
-
-    test "example" do
-      assert Alchemical.reduce_recursively('dabAcCaCBAcCcaDA') == 'dabCBAcaDA'
-    end
-
-    test "part 1" do
-      assert File.read!("./fixtures/day_5.txt")
-             |> String.trim()
-             |> String.to_charlist()
-             |> Alchemical.reduce_recursively()
-             |> length() == 11668
-    end
-  end
 
   describe "reduce/1" do
     test "changes nothing for an empty string" do
@@ -70,6 +46,22 @@ defmodule AlchemicalTest do
 
     test "destroys in the middle" do
       assert Alchemical.reduce('dbaAce') == 'dbce'
+    end
+
+    test "reduces recursively" do
+      assert Alchemical.reduce('aBbA') == ''
+    end
+
+    test "example" do
+      assert Alchemical.reduce('dabAcCaCBAcCcaDA') == 'dabCBAcaDA'
+    end
+
+    test "part 1" do
+      assert File.read!("./fixtures/day_5.txt")
+             |> String.trim()
+             |> String.to_charlist()
+             |> Alchemical.reduce()
+             |> length() == 11668
     end
   end
 end
