@@ -27,6 +27,10 @@ ExUnit.start()
 defmodule AlchemicalTest do
   use ExUnit.Case
 
+  @input File.read!("./fixtures/day_5.txt")
+         |> String.trim()
+         |> String.to_charlist()
+
   describe "reduce/1" do
     test "changes nothing for an empty string" do
       assert Alchemical.reduce('') == ''
@@ -57,9 +61,7 @@ defmodule AlchemicalTest do
     end
 
     test "part 1" do
-      assert File.read!("./fixtures/day_5.txt")
-             |> String.trim()
-             |> String.to_charlist()
+      assert @input
              |> Alchemical.reduce()
              |> length() == 11668
     end
