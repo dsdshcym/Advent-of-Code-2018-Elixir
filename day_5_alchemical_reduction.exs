@@ -2,25 +2,21 @@ defmodule Alchemical do
   defguardp react?(c1, c2) when abs(c1 - c2) == ?a - ?A
 
   def shortest_length(units) do
-    all_units =
-      units
-      |> Enum.map(&downcase/1)
-      |> Enum.uniq()
-
-    all_possible_inputs =
-      all_units
-      |> Enum.map(fn
-        unit ->
-          Enum.reject(units, fn c -> downcase(c) == unit end)
-      end)
-
-    all_possible_results =
-      all_possible_inputs
-      |> Enum.map(&reduce/1)
-
-    all_possible_results
+    units
+    |> all_possible_inputs()
+    |> Enum.map(&reduce/1)
     |> Enum.min_by(&length/1)
     |> length()
+  end
+
+  defp all_possible_inputs(units) do
+    units
+    |> Enum.map(&downcase/1)
+    |> Enum.uniq()
+    |> Enum.map(fn
+      unit ->
+        Enum.reject(units, fn c -> downcase(c) == unit end)
+    end)
   end
 
   defp downcase(c) when c in ?a..?z, do: c
