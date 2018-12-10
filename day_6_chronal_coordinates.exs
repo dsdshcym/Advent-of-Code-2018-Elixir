@@ -1,4 +1,17 @@
 defmodule ChronalCoordinates do
+  def region_size_of_points_total_distance_less_than(coordinates, distance_limit) do
+    coordinates
+    |> all_points()
+    |> Enum.filter(&(total_distance(coordinates, &1) < distance_limit))
+    |> Enum.count()
+  end
+
+  defp total_distance(coordinates, point) do
+    coordinates
+    |> Enum.map(&manhattan_distance(&1, point))
+    |> Enum.sum()
+  end
+
   def fill_closest(coordinates) do
     for point <- all_points(coordinates), into: Map.new() do
       {point, closest_to(coordinates, point)}
@@ -150,6 +163,34 @@ defmodule ChronalCoordinatesTest do
                line |> String.split(", ") |> Enum.map(&String.to_integer/1) |> List.to_tuple()
              end)
              |> ChronalCoordinates.largest_infinite_size() == 3006
+    end
+  end
+
+  describe "region_size_of_points_total_distance_less_than/1" do
+    test "example" do
+      coordinates = [
+        {1, 1},
+        {1, 6},
+        {8, 3},
+        {3, 4},
+        {5, 5},
+        {8, 9}
+      ]
+
+      assert ChronalCoordinates.region_size_of_points_total_distance_less_than(
+               coordinates,
+               32
+             ) == 16
+    end
+
+    test "puzzle input" do
+      assert "./fixtures/day_6.txt"
+             |> File.read!()
+             |> String.split("\n", trim: true)
+             |> Enum.map(fn line ->
+               line |> String.split(", ") |> Enum.map(&String.to_integer/1) |> List.to_tuple()
+             end)
+             |> ChronalCoordinates.region_size_of_points_total_distance_less_than(10000) == 42998
     end
   end
 end
