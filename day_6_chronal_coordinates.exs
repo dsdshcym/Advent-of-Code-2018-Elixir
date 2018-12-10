@@ -1,9 +1,6 @@
 defmodule ChronalCoordinates do
   def fill_closest(coordinates) do
-    {max_x, _} = coordinates |> Enum.max_by(fn {x, _y} -> x end)
-    {_, max_y} = coordinates |> Enum.max_by(fn {_x, y} -> y end)
-
-    for x <- 0..max_x, y <- 0..max_y, point = {x, y}, into: Map.new() do
+    for point <- all_points(coordinates), into: Map.new() do
       {point, closest_to(coordinates, point)}
     end
   end
@@ -22,16 +19,21 @@ defmodule ChronalCoordinates do
     {_, max_y} = coordinates |> Enum.max_by(fn {_x, y} -> y end)
 
     infinite_points =
-      for x <- 0..max_x,
-          y <- 0..max_y,
+      for {x, y} = edge_point <- all_points(coordinates),
           x == 0 or x == max_x or y == 0 or y == max_y,
-          edge_point = {x, y},
           into: MapSet.new() do
         map[edge_point]
       end
       |> MapSet.to_list()
 
     coordinates -- infinite_points
+  end
+
+  defp all_points(coordinates) do
+    {max_x, _} = coordinates |> Enum.max_by(fn {x, _y} -> x end)
+    {_, max_y} = coordinates |> Enum.max_by(fn {_x, y} -> y end)
+
+    for x <- 0..max_x, y <- 0..max_y, do: {x, y}
   end
 
   defp closest_to(coordinates, point) do
