@@ -9,10 +9,17 @@ defmodule ChronalCoordinates do
   end
 
   def largest_infinite_size(coordinates) do
+    map = fill_closest(coordinates)
+
+    coordinates
+    |> finite_points(map)
+    |> Enum.map(fn p -> Enum.count(map, fn {_another_p, closest} -> closest == p end) end)
+    |> Enum.max()
+  end
+
+  defp finite_points(coordinates, map) do
     {max_x, _} = coordinates |> Enum.max_by(fn {x, _y} -> x end)
     {_, max_y} = coordinates |> Enum.max_by(fn {_x, y} -> y end)
-
-    map = coordinates |> fill_closest
 
     infinite_points =
       for x <- 0..max_x,
@@ -24,11 +31,7 @@ defmodule ChronalCoordinates do
       end
       |> MapSet.to_list()
 
-    finite_points = coordinates -- infinite_points
-
-    finite_points
-    |> Enum.map(fn p -> Enum.count(map, fn {_another_p, closest} -> closest == p end) end)
-    |> Enum.max()
+    coordinates -- infinite_points
   end
 
   defp closest_to(coordinates, point) do
