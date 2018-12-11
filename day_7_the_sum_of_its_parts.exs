@@ -26,12 +26,7 @@ defmodule KitInstructions do
   end
 
   defp topological_sort(edges, steps) do
-    [first_ready_step | _others] =
-      steps
-      |> Enum.filter(fn ready_step ->
-        Enum.all?(edges, fn {_prerequisite, step} -> step != ready_step end)
-      end)
-      |> Enum.sort()
+    first_ready_step = first_ready_step(edges, steps)
 
     remain_edges =
       edges
@@ -40,6 +35,17 @@ defmodule KitInstructions do
     remain_steps = steps -- [first_ready_step]
 
     [first_ready_step | topological_sort(remain_edges, remain_steps)]
+  end
+
+  defp first_ready_step(edges, steps) do
+    [first_ready_step | _others] =
+      steps
+      |> Enum.filter(fn ready_step ->
+        Enum.all?(edges, fn {_prerequisite, step} -> step != ready_step end)
+      end)
+      |> Enum.sort()
+
+    first_ready_step
   end
 end
 
