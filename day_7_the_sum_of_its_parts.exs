@@ -24,7 +24,7 @@ defmodule KitInstructions do
   end
 
   defp topological_sort(edges, steps) do
-    first_ready_step = first_ready_step(edges, steps)
+    [first_ready_step | _others] = next_steps(edges, steps)
 
     remain_edges =
       edges
@@ -39,15 +39,12 @@ defmodule KitInstructions do
     edges |> Enum.flat_map(&Tuple.to_list/1) |> Enum.uniq()
   end
 
-  defp first_ready_step(edges, steps) do
-    [first_ready_step | _others] =
-      steps
-      |> Enum.filter(fn ready_step ->
-        Enum.all?(edges, fn {_prerequisite, step} -> step != ready_step end)
-      end)
-      |> Enum.sort()
-
-    first_ready_step
+  defp next_steps(edges, steps) do
+    steps
+    |> Enum.filter(fn ready_step ->
+      Enum.all?(edges, fn {_prerequisite, step} -> step != ready_step end)
+    end)
+    |> Enum.sort()
   end
 end
 
