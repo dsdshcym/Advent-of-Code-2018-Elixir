@@ -23,8 +23,8 @@ defmodule LicenseFile do
     {%{children: children, metadata: metadata}, leftover}
   end
 
-  def metadata_sum(tree) do
-    children_metadata_sum = tree.children |> Enum.map(&metadata_sum/1) |> Enum.sum()
+  def tree_metadata_sum(tree) do
+    children_metadata_sum = tree.children |> Enum.map(&tree_metadata_sum/1) |> Enum.sum()
     self_metadata_sum = tree.metadata |> Enum.sum()
 
     children_metadata_sum + self_metadata_sum
@@ -46,7 +46,7 @@ defmodule LicenseFileTest do
         input
         |> LicenseFile.parse()
 
-      assert tree |> LicenseFile.metadata_sum() == 138
+      assert tree |> LicenseFile.tree_metadata_sum() == 138
     end
 
     test "puzzle input" do
@@ -54,7 +54,7 @@ defmodule LicenseFileTest do
         @input
         |> LicenseFile.parse()
 
-      assert tree |> LicenseFile.metadata_sum() == 47112
+      assert tree |> LicenseFile.tree_metadata_sum() == 47112
     end
   end
 
@@ -93,7 +93,7 @@ defmodule LicenseFileTest do
     end
   end
 
-  describe "metadata_sum/1" do
+  describe "tree_metadata_sum/1" do
     test "returns sum of all metadata entries from all nodes" do
       tree = %{
         children: [
@@ -103,7 +103,7 @@ defmodule LicenseFileTest do
         metadata: [4, 5]
       }
 
-      assert LicenseFile.metadata_sum(tree) == 15
+      assert LicenseFile.tree_metadata_sum(tree) == 15
     end
   end
 end
