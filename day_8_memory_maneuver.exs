@@ -29,9 +29,13 @@ defmodule LicenseFile do
 
   def tree_metadata_sum(tree) do
     children_metadata_sum = tree.children |> Enum.map(&tree_metadata_sum/1) |> Enum.sum()
-    self_metadata_sum = tree.metadata |> Enum.sum()
+    self_metadata_sum = metadata_sum(tree)
 
     children_metadata_sum + self_metadata_sum
+  end
+
+  defp metadata_sum(node) do
+    Enum.sum(node.metadata)
   end
 end
 
