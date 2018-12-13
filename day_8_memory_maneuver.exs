@@ -1,4 +1,8 @@
 defmodule LicenseFile do
+  defmodule Node do
+    defstruct children: [], metadata: []
+  end
+
   def parse(input) do
     input
     |> String.split()
@@ -20,7 +24,7 @@ defmodule LicenseFile do
 
     {metadata, leftover} = Enum.split(leftover, metadata_num)
 
-    {%{children: children, metadata: metadata}, leftover}
+    {%Node{children: children, metadata: metadata}, leftover}
   end
 
   def tree_metadata_sum(tree) do
