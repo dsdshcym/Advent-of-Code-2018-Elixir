@@ -34,6 +34,20 @@ defmodule LicenseFile do
     children_metadata_sum + self_metadata_sum
   end
 
+  def value(%{children: []} = node) do
+    metadata_sum(node)
+  end
+
+  def value(node) do
+    node.metadata
+    |> Enum.map(fn metadata_entry ->
+      node.children
+      |> Enum.at(metadata_entry - 1, %Node{})
+      |> value()
+    end)
+    |> Enum.sum()
+  end
+
   defp metadata_sum(node) do
     Enum.sum(node.metadata)
   end
@@ -112,6 +126,52 @@ defmodule LicenseFileTest do
       }
 
       assert LicenseFile.tree_metadata_sum(tree) == 15
+    end
+  end
+
+  describe "part 2" do
+    test "example" do
+      input = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
+
+      {tree, []} =
+        input
+        |> LicenseFile.parse()
+
+      assert tree |> LicenseFile.value() == 66
+    end
+
+    test "puzzle input" do
+      {tree, []} =
+        @input
+        |> LicenseFile.parse()
+
+      assert tree |> LicenseFile.value() == 28237
+    end
+  end
+
+  describe "value/1" do
+    test "returns sum of metadata if it does not have any children" do
+      assert LicenseFile.value(%{children: [], metadata: [1, 2]}) == 3
+    end
+
+    test "returns the sum of the values of the child nodes referenced by the metadata entries" do
+      assert LicenseFile.value(%{
+               children: [
+                 %{children: [], metadata: [1, 2]},
+                 %{children: [], metadata: [3, 4]},
+                 %{children: [], metadata: [5, 6]}
+               ],
+               metadata: [2, 3]
+             }) == 18
+    end
+
+    test "skips metadata entries that references a non-exist child" do
+      assert LicenseFile.value(%{
+               children: [
+                 %{children: [], metadata: [1]}
+               ],
+               metadata: [2]
+             }) == 0
     end
   end
 end
