@@ -1,61 +1,67 @@
 defmodule Marble do
   defmodule Circle do
-    defstruct left: [], current: nil, right: []
+    defstruct left_stack: [], current: nil, right_queue: []
 
     def traverse_clockwisely(circle, 0) do
       circle
     end
 
-    def traverse_clockwisely(%{left: [], right: []} = circle, _step) do
+    def traverse_clockwisely(%{left_stack: [], right_queue: []} = circle, _step) do
       circle
     end
 
-    def traverse_clockwisely(%{right: [new_current | new_right]} = circle, step) do
+    def traverse_clockwisely(%{right_queue: [new_current | new_right_queue]} = circle, step) do
       %__MODULE__{
-        left: circle.left ++ [circle.current],
+        left_stack: [circle.current | circle.left_stack],
         current: new_current,
-        right: new_right
+        right_queue: new_right_queue
       }
       |> traverse_clockwisely(step - 1)
     end
 
-    def traverse_clockwisely(%{right: []} = circle, step) do
-      traverse_clockwisely(%{circle | left: circle.right, right: circle.left}, step)
+    def traverse_clockwisely(%{right_queue: []} = circle, step) do
+      traverse_clockwisely(
+        %{circle | left_stack: [], right_queue: Enum.reverse(circle.left_stack)},
+        step
+      )
     end
 
     def traverse_counter_clockwisely(circle, 0) do
       circle
     end
 
-    def traverse_counter_clockwisely(%{left: [], right: []} = circle, _step) do
+    def traverse_counter_clockwisely(%{left_stack: [], right_queue: []} = circle, _step) do
       circle
     end
 
-    def traverse_counter_clockwisely(%{left: []} = circle, step) do
-      traverse_counter_clockwisely(%{circle | left: circle.right, right: []}, step)
+    def traverse_counter_clockwisely(%{left_stack: []} = circle, step) do
+      traverse_counter_clockwisely(
+        %{circle | left_stack: Enum.reverse(circle.right_queue), right_queue: []},
+        step
+      )
     end
 
     def traverse_counter_clockwisely(circle, step) do
-      {new_current, new_left} = List.pop_at(circle.left, -1)
+      [new_current | new_left_stack] = circle.left_stack
 
       %__MODULE__{
-        left: new_left,
+        left_stack: new_left_stack,
         current: new_current,
-        right: [circle.current | circle.right]
+        right_queue: [circle.current | circle.right_queue]
       }
       |> traverse_counter_clockwisely(step - 1)
     end
 
-    def pop(%{right: []} = circle) do
-      pop(%{circle | left: circle.right, right: circle.left})
+    def pop(%{right_queue: []} = circle) do
+      pop(%{circle | left_stack: circle.right_queue, right_queue: circle.left_stack})
     end
 
-    def pop(%{right: [new_current | new_right]} = circle) do
-      {circle.current, %{circle | right: new_right, current: new_current}}
+    def pop(%{right_queue: [new_current | new_right_queue]} = circle) do
+      {circle.current, %{circle | right_queue: new_right_queue, current: new_current}}
     end
 
     def insert(circle, value) do
-      %{circle | right: [circle.current | circle.right], current: value}
+      %{circle | right_queue: [circle.current | circle.right_queue], current: value}
     end
   end
 
@@ -123,6 +129,12 @@ defmodule MarbleTest do
 
     test "puzzle input" do
       assert Marble.part_1(@input) == 429_287
+    end
+  end
+
+  describe "part 2" do
+    test "puzzle input" do
+      assert Marble.part_1("410 players; last marble is worth 7205900 points") == 3_624_387_659
     end
   end
 
