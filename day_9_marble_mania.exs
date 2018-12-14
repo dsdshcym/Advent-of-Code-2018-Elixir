@@ -1,10 +1,70 @@
 defmodule Marble do
+  defmodule Circle do
+    defstruct left: [], current: nil, right: []
+
+    def traverse_clockwisely(circle, 0) do
+      circle
+    end
+
+    def traverse_clockwisely(%{left: [], right: []} = circle, _step) do
+      circle
+    end
+
+    def traverse_clockwisely(%{right: [new_current | new_right]} = circle, step) do
+      %__MODULE__{
+        left: circle.left ++ [circle.current],
+        current: new_current,
+        right: new_right
+      }
+      |> traverse_clockwisely(step - 1)
+    end
+
+    def traverse_clockwisely(%{right: []} = circle, step) do
+      traverse_clockwisely(%{circle | left: circle.right, right: circle.left}, step)
+    end
+
+    def traverse_counter_clockwisely(circle, 0) do
+      circle
+    end
+
+    def traverse_counter_clockwisely(%{left: [], right: []} = circle, _step) do
+      circle
+    end
+
+    def traverse_counter_clockwisely(%{left: []} = circle, step) do
+      traverse_counter_clockwisely(%{circle | left: circle.right, right: []}, step)
+    end
+
+    def traverse_counter_clockwisely(circle, step) do
+      {new_current, new_left} = List.pop_at(circle.left, -1)
+
+      %__MODULE__{
+        left: new_left,
+        current: new_current,
+        right: [circle.current | circle.right]
+      }
+      |> traverse_counter_clockwisely(step - 1)
+    end
+
+    def pop(%{right: []} = circle) do
+      pop(%{circle | left: circle.right, right: circle.left})
+    end
+
+    def pop(%{right: [new_current | new_right]} = circle) do
+      {circle.current, %{circle | right: new_right, current: new_current}}
+    end
+
+    def insert(circle, value) do
+      %{circle | right: [circle.current | circle.right], current: value}
+    end
+  end
+
   def part_1(input) do
     {players, last_marble} = parse(input)
 
     {points, _last_status} =
       1..last_marble
-      |> Enum.map_reduce(%{circle: [0], current_index: 0}, &place_marble/2)
+      |> Enum.map_reduce(%Circle{current: 0}, &place_marble/2)
 
     {_player, high_score} =
       1..players
@@ -25,33 +85,22 @@ defmodule Marble do
     {String.to_integer(players), String.to_integer(last_marble)}
   end
 
-  def simulate(_) do
+  def place_marble(marble, circle) when rem(marble, 23) == 0 do
+    {removed_marble, new_circle} =
+      circle
+      |> Circle.traverse_counter_clockwisely(7)
+      |> Circle.pop()
+
+    {removed_marble + marble, new_circle}
   end
 
-  def place_marble(marble, status) when rem(marble, 23) == 0 do
-    next_index = counter_clockwise(status.current_index, 7, length(status.circle))
+  def place_marble(marble, circle) do
+    new_circle =
+      circle
+      |> Circle.traverse_clockwisely(2)
+      |> Circle.insert(marble)
 
-    {removed_marble, new_circle} = List.pop_at(status.circle, next_index)
-
-    {removed_marble + marble, %{circle: new_circle, current_index: next_index}}
-  end
-
-  def place_marble(marble, status) do
-    next_index = clockwise(status.current_index, 2, length(status.circle))
-
-    {0, %{circle: List.insert_at(status.circle, next_index, marble), current_index: next_index}}
-  end
-
-  defp clockwise(index, 0, _limit), do: index
-  defp clockwise(index, step, limit) when index == limit, do: clockwise(1, step - 1, limit)
-  defp clockwise(index, step, limit), do: clockwise(index + 1, step - 1, limit)
-
-  defp counter_clockwise(index, 0, _limit), do: index
-  defp counter_clockwise(0, step, limit), do: counter_clockwise(limit - 1, step - 1, limit)
-  defp counter_clockwise(index, step, limit), do: counter_clockwise(index - 1, step - 1, limit)
-
-  def high_score(_) do
-    8317
+    {0, new_circle}
   end
 end
 
@@ -86,116 +135,111 @@ defmodule MarbleTest do
       assert {_, 1618} = Marble.parse("10 players; last marble is worth 1618 points")
     end
   end
+end
 
-  describe "place_marble/2" do
-    test "inserts 1 after 0" do
-      assert {_, %{circle: [0, 1], current_index: 1}} =
-               Marble.place_marble(1, %{circle: [0], current_index: 0})
+defmodule Marble.CircleTest do
+  use ExUnit.Case
+
+  alias Marble.Circle
+
+  describe "traverse_clockwisely/2" do
+    test "returns circle when step is 0" do
+      assert Circle.traverse_clockwisely(%Circle{}, 0) == %Circle{}
     end
 
-    test "returns 0 as score for marbles that are not multiples of 23" do
-      assert {0, _} = Marble.place_marble(1, %{circle: [0], current_index: 0})
+    test "returns circle when it has only one item (current)" do
+      assert Circle.traverse_clockwisely(%Circle{left: [], right: [], current: 100}, 329) ==
+               %Circle{left: [], right: [], current: 100}
     end
 
-    test "inserts 2 between 0 and 1" do
-      assert {_, %{circle: [0, 2, 1], current_index: 1}} =
-               Marble.place_marble(2, %{circle: [0, 1], current_index: 1})
+    test "sets current to the first item of right when right is not empty" do
+      assert %Circle{current: 1} = Circle.traverse_clockwisely(%Circle{right: [1, 2]}, 1)
     end
 
-    test "inserts 3 after 1" do
-      assert {_, %{circle: [0, 2, 1, 3], current_index: 3}} =
-               Marble.place_marble(3, %{circle: [0, 2, 1], current_index: 1})
+    test "pops first item of right when right is not empty" do
+      assert %Circle{right: [2]} = Circle.traverse_clockwisely(%Circle{right: [1, 2]}, 1)
     end
 
-    test "does not insert 23 and removes 7 marbles counter-clockwise from the current marble" do
-      assert {_,
-              %{
-                circle: [
-                  0,
-                  16,
-                  8,
-                  17,
-                  4,
-                  18,
-                  19,
-                  2,
-                  20,
-                  10,
-                  21,
-                  5,
-                  22,
-                  11,
-                  1,
-                  12,
-                  6,
-                  13,
-                  3,
-                  14,
-                  7,
-                  15
-                ],
-                current_index: 6
-              }} =
-               Marble.place_marble(23, %{
-                 circle: [
-                   0,
-                   16,
-                   8,
-                   17,
-                   4,
-                   18,
-                   9,
-                   19,
-                   2,
-                   20,
-                   10,
-                   21,
-                   5,
-                   22,
-                   11,
-                   1,
-                   12,
-                   6,
-                   13,
-                   3,
-                   14,
-                   7,
-                   15
-                 ],
-                 current_index: 13
-               })
+    test "pushes old current to the end of left when right is not empty" do
+      assert %Circle{left: [0, 1]} =
+               Circle.traverse_clockwisely(%Circle{left: [0], current: 1, right: [2]}, 1)
     end
 
-    test "returns 23 + 9 (7 marbles counter-clockwise from the current marble) as score" do
-      assert {32, _} =
-               Marble.place_marble(23, %{
-                 circle: [
-                   0,
-                   16,
-                   8,
-                   17,
-                   4,
-                   18,
-                   9,
-                   19,
-                   2,
-                   20,
-                   10,
-                   21,
-                   5,
-                   22,
-                   11,
-                   1,
-                   12,
-                   6,
-                   13,
-                   3,
-                   14,
-                   7,
-                   15
-                 ],
-                 current_index: 13
-               })
+    test "cycles when right is empty" do
+      assert %Circle{left: [2], current: 0, right: [1]} =
+               Circle.traverse_clockwisely(%Circle{left: [0, 1], current: 2, right: []}, 1)
+    end
+
+    test "runs recursively until step is 0" do
+      assert %Circle{left: [1], current: 2, right: [0]} =
+               Circle.traverse_clockwisely(%Circle{left: [0, 1], current: 2, right: []}, 3)
+    end
+  end
+
+  describe "traverse_counter_clockwisely/2" do
+    test "returns circle when step is 0" do
+      assert Circle.traverse_counter_clockwisely(%Circle{}, 0) == %Circle{}
+    end
+
+    test "returns circle when it has only one item (current)" do
+      assert Circle.traverse_counter_clockwisely(%Circle{left: [], right: [], current: 23}, 23) ==
+               %Circle{left: [], right: [], current: 23}
+    end
+
+    test "sets current to the last item of left when left is not empty" do
+      assert %Circle{current: 1} = Circle.traverse_counter_clockwisely(%Circle{left: [2, 1]}, 1)
+    end
+
+    test "pops last item of left when left is not empty" do
+      assert %Circle{left: [2]} = Circle.traverse_counter_clockwisely(%Circle{left: [2, 1]}, 1)
+    end
+
+    test "pushes old current to the beginning of right" do
+      assert %Circle{right: [3, 4, 5]} =
+               Circle.traverse_counter_clockwisely(
+                 %Circle{left: [1], current: 3, right: [4, 5]},
+                 1
+               )
+    end
+
+    test "cycles when left is empty" do
+      assert %Circle{left: [2], current: 3, right: [1]} =
+               Circle.traverse_counter_clockwisely(
+                 %Circle{left: [], current: 1, right: [2, 3]},
+                 1
+               )
+    end
+
+    test "runs recursively until step is 0" do
+      assert %Circle{left: [2], current: 3, right: [1]} =
+               Circle.traverse_counter_clockwisely(
+                 %Circle{left: [1], current: 2, right: [3]},
+                 2
+               )
+    end
+  end
+
+  describe "pop/1" do
+    test "returns current as the popped value" do
+      assert {1, _} = Circle.pop(%Circle{current: 1, right: [0]})
+    end
+
+    test "sets current to the first item of right when right is not empty" do
+      assert {_, %Circle{current: 1, right: [3]}} = Circle.pop(%Circle{right: [1, 3]})
+    end
+
+    test "sets current to the first item of left when right is empty" do
+      assert {_, %Circle{current: 0, right: [2]}} = Circle.pop(%Circle{left: [0, 2], right: []})
+    end
+  end
+
+  describe "insert/2" do
+    test "moves current into right" do
+      assert %Circle{right: [0]} = Circle.insert(%Circle{left: [], current: 0}, 1)
+    end
+
+    test "sets current to value" do
+      assert %Circle{current: 1} = Circle.insert(%Circle{current: 0}, 1)
     end
   end
 end
