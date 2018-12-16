@@ -34,10 +34,13 @@ defmodule FuelGrid do
     min_x..max_x = grid.x_range
     min_y..max_y = grid.y_range
 
-    for x <- min_x..(max_x - size + 1), y <- min_y..(max_y - size + 1) do
-      {x, y}
-    end
-    |> Enum.max_by(&square_sum(grid.power_levels, &1, size))
+    top_left =
+      for x <- min_x..(max_x - size + 1), y <- min_y..(max_y - size + 1) do
+        {x, y}
+      end
+      |> Enum.max_by(&square_sum(grid.power_levels, &1, size))
+
+    {top_left, square_sum(grid.power_levels, top_left, size)}
   end
 
   defp square_sum(power_levels, {x, y}, size) do
@@ -58,7 +61,7 @@ defmodule FuelGridTest do
 
     assert grid_serial_number
            |> FuelGrid.generate(1..300, 1..300)
-           |> FuelGrid.largest_3x3_square() == {21, 37}
+           |> FuelGrid.largest_3x3_square() == {{21, 37}, 30}
   end
 
   describe "calc/2" do
@@ -115,7 +118,7 @@ defmodule FuelGridTest do
         y_range: 1..5
       }
 
-      assert FuelGrid.largest_3x3_square(grid) == {2, 2}
+      assert FuelGrid.largest_3x3_square(grid) == {{2, 2}, 29}
     end
   end
 end
