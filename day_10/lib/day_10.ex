@@ -63,4 +63,18 @@ defmodule Day10 do
 
     max_y - min_y
   end
+
+  def seconds_until_minimal_y_diff(world) do
+    world
+    |> Stream.iterate(&tick/1)
+    |> Enum.reduce_while({0, nil}, fn new_world, {seconds, last_y_diff} ->
+      new_y_diff = y_diff(new_world)
+
+      if last_y_diff == nil || new_y_diff < last_y_diff do
+        {:cont, {seconds + 1, new_y_diff}}
+      else
+        {:halt, seconds - 1}
+      end
+    end)
+  end
 end
