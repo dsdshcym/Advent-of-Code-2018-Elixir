@@ -26,6 +26,20 @@ defmodule FuelGrid do
   def hundreds_digit(number) when 0 <= number and number < 100, do: 0
   def hundreds_digit(number) when number >= 100, do: number |> div(100) |> rem(10)
 
+  def largest_square_and_size(grid) do
+    1..Enum.min([Enum.count(grid.x_range), Enum.count(grid.y_range)])
+    |> Task.async_stream(
+      fn size ->
+        {point, sum} = largest_square(grid, size)
+
+        {point, size, sum}
+      end,
+      timeout: :infinity
+    )
+    |> Enum.map(fn {:ok, res} -> res |> IO.inspect() end)
+    |> Enum.max_by(fn {_point, _size, sum} -> sum end)
+  end
+
   def largest_3x3_square(grid) do
     largest_square(grid, 3)
   end
@@ -62,6 +76,15 @@ defmodule FuelGridTest do
     assert grid_serial_number
            |> FuelGrid.generate(1..300, 1..300)
            |> FuelGrid.largest_3x3_square() == {{21, 37}, 30}
+  end
+
+  @tag timeout: :infinity
+  test "part 2" do
+    grid_serial_number = 8561
+
+    assert grid_serial_number
+           |> FuelGrid.generate(1..300, 1..300)
+           |> FuelGrid.largest_square_and_size() == nil
   end
 
   describe "calc/2" do
