@@ -27,17 +27,21 @@ defmodule FuelGrid do
   def hundreds_digit(number) when number >= 100, do: number |> div(100) |> rem(10)
 
   def largest_3x3_square(grid) do
+    largest_square(grid, 3)
+  end
+
+  def largest_square(grid, size) do
     min_x..max_x = grid.x_range
     min_y..max_y = grid.y_range
 
-    for x <- min_x..(max_x - 2), y <- min_y..(max_y - 2) do
+    for x <- min_x..(max_x - size + 1), y <- min_y..(max_y - size + 1) do
       {x, y}
     end
-    |> Enum.max_by(&sum_3x3_square(grid.power_levels, &1))
+    |> Enum.max_by(&square_sum(grid.power_levels, &1, size))
   end
 
-  defp sum_3x3_square(power_levels, {x, y}) do
-    for dx <- 0..2, dy <- 0..2 do
+  defp square_sum(power_levels, {x, y}, size) do
+    for dx <- 0..(size - 1), dy <- 0..(size - 1) do
       power_levels[{x + dx, y + dy}]
     end
     |> Enum.sum()
