@@ -6,24 +6,52 @@ defmodule Day12 do
   defmodule Pots do
     def new(index_pot_pairs) do
       index_pot_pairs
-      |> Map.new()
+      |> trim_leading_empty_pots()
+      |> trim_trailing_empty_pots()
+      |> to_pots()
+    end
+
+    defp to_pots([]) do
+      %{
+        start: 0,
+        plants: []
+      }
+    end
+
+    defp to_pots([{start_index, _} | _] = index_pot_pairs) do
+      %{
+        start: start_index,
+        plants: index_pot_pairs |> Enum.map(fn {_index, pot} -> pot end)
+      }
+    end
+
+    defp trim_trailing_empty_pots(index_pot_pairs) do
+      index_pot_pairs
+      |> Enum.reverse()
+      |> trim_leading_empty_pots
+      |> Enum.reverse()
+    end
+
+    defp trim_leading_empty_pots([{_index, ?.} | tail]) do
+      trim_leading_empty_pots(tail)
+    end
+
+    defp trim_leading_empty_pots(index_pot_pairs) do
+      index_pot_pairs
     end
 
     def index_llcrr_pairs(pots) do
-      {min, max} = pots |> plant_numbers() |> Enum.min_max()
-
-      (min - 2)..(max + 2)
-      |> Enum.map(fn index -> {index, llcrr(pots, index)} end)
+      ([?., ?., ?., ?. | pots.plants] ++ [?., ?., ?., ?.])
+      |> Enum.chunk_every(5, 1, :discard)
+      |> Enum.with_index(pots.start - 2)
+      |> Enum.map(fn {llcrr, index} -> {index, llcrr} end)
     end
 
     def plant_numbers(pots) do
-      pots
-      |> Enum.filter(fn {_index, plant} -> plant == ?# end)
-      |> Enum.map(fn {index, _plant} -> index end)
-    end
-
-    defp llcrr(pots, index) do
-      (index - 2)..(index + 2) |> Enum.map(&Map.get(pots, &1, ?.))
+      pots.plants
+      |> Enum.with_index(pots.start)
+      |> Enum.filter(fn {plant, _index} -> plant == ?# end)
+      |> Enum.map(fn {_plant, index} -> index end)
     end
   end
 

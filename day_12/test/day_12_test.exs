@@ -78,16 +78,6 @@ defmodule Day12Test do
     end
   end
 
-  describe "pots/1" do
-    test "indices start from zero" do
-      assert Day12.pots('.') == %{0 => ?.}
-    end
-
-    test "returns a Map with index as keys, plant status as values" do
-      assert Day12.pots('.#.') == %{0 => ?., 1 => ?#, 2 => ?.}
-    end
-  end
-
   describe "spread/2" do
     test "destroys the plant if no matches (for the examples)" do
       pots = pots('..#..')
@@ -128,6 +118,6 @@ defmodule Day12Test do
     input
     |> Enum.with_index(start_from)
     |> Enum.map(fn {pot, index} -> {index, pot} end)
-    |> Map.new()
+    |> Day12.Pots.new()
   end
 end
