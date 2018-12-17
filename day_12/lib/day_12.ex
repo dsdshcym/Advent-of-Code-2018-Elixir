@@ -11,17 +11,25 @@ defmodule Day12 do
   end
 
   def spread(pots, notes) do
-    {min, max} = pots |> plant_numbers() |> Enum.min_max()
-
-    (min - 2)..(max + 2)
-    |> Enum.map(fn index -> {index, next_status(pots, notes, index)} end)
+    pots
+    |> index_llcrr_pairs()
+    |> Enum.map(fn {index, llcrr} -> {index, next_status(notes, llcrr)} end)
     |> Map.new()
   end
 
-  defp next_status(pots, notes, index) do
-    llcrr = (index - 2)..(index + 2) |> Enum.map(&Map.get(pots, &1, ?.))
+  defp index_llcrr_pairs(pots) do
+    {min, max} = pots |> plant_numbers() |> Enum.min_max()
 
+    (min - 2)..(max + 2)
+    |> Enum.map(fn index -> {index, llcrr(pots, index)} end)
+  end
+
+  defp next_status(notes, llcrr) do
     Map.get(notes, llcrr, ?.)
+  end
+
+  defp llcrr(pots, index) do
+    (index - 2)..(index + 2) |> Enum.map(&Map.get(pots, &1, ?.))
   end
 
   def plant_numbers(pots) do
