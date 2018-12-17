@@ -117,7 +117,6 @@ defmodule Day12Test do
   defp pots(input, start_from \\ 0) do
     input
     |> Enum.with_index(start_from)
-    |> Enum.map(fn {pot, index} -> {index, pot} end)
     |> Day12.Pots.new()
   end
 end
