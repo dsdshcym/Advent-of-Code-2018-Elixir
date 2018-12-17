@@ -107,14 +107,14 @@ defmodule Day12Test do
       pots = pots('##...')
       notes = %{'...##' => ?#}
 
-      assert Day12.spread(pots, notes) == pots('#.....', -1)
+      assert Day12.spread(pots, notes) == pots('.#....', -2)
     end
 
     test "updates pots to the right" do
       pots = pots('...##')
       notes = %{'##...' => ?#}
 
-      assert Day12.spread(pots, notes) == pots('.....#', 0)
+      assert Day12.spread(pots, notes) == pots('....#.', 1)
     end
   end
 
