@@ -2,6 +2,47 @@ defmodule Day13Test do
   use ExUnit.Case
   doctest Day13
 
+  @input File.read!("./test/fixtures/puzzle_input.txt")
+
+  describe "part 1" do
+    test "short example" do
+      input = ~S[
+|
+v
+|
+|
+|
+^
+|
+      ] |> String.trim()
+
+      assert input
+             |> Day13.parse()
+             |> Day13.first_crash_location() == {0, 3}
+    end
+
+    test "long example" do
+      input = ~S[
+/->-\
+|   |  /----\
+| /-+--+-\  |
+| | |  | v  |
+\-+-/  \-+--/
+  \------/
+      ] |> String.trim()
+
+      assert input
+             |> Day13.parse()
+             |> Day13.first_crash_location() == {7, 3}
+    end
+
+    test "puzzle input" do
+      assert @input
+             |> Day13.parse()
+             |> Day13.first_crash_location() == {14, 42}
+    end
+  end
+
   describe "parse/1" do
     test "stores tracks in a map" do
       assert Day13.parse("/-\\").tracks == %{{0, 0} => "/", {1, 0} => "-", {2, 0} => "\\"}

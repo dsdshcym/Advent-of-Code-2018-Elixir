@@ -54,6 +54,13 @@ defmodule Day13 do
     }
   end
 
+  def first_crash_location(mine) do
+    case tick(mine) do
+      %{crashed_at: crashed_at} -> crashed_at
+      new_mine -> first_crash_location(new_mine)
+    end
+  end
+
   def tick(mine) do
     case move_carts_and_detect_crash(mine.carts, mine.tracks) do
       {:ok, moved_carts} ->
