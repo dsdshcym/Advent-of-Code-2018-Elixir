@@ -4,6 +4,13 @@ defmodule Day12 do
   """
 
   defmodule Pots do
+    def new() do
+      %{
+        start: 0,
+        plants: []
+      }
+    end
+
     def new(pot_index_pairs) do
       pot_index_pairs
       |> trim_leading_empty_pots()
@@ -73,5 +80,24 @@ defmodule Day12 do
 
   def plant_numbers(pots) do
     Pots.plant_numbers(pots)
+  end
+
+  def repeat_spread_until_find_the_pattern(pots, notes, target) do
+    {old_pots, new_pots, new_index} =
+      pots
+      |> Stream.iterate(&spread(&1, notes))
+      |> Stream.with_index()
+      |> Enum.reduce_while(Pots.new(), fn {new_pots, index}, old_pots ->
+        if old_pots.plants == new_pots.plants do
+          {:halt, {old_pots, new_pots, index}}
+        else
+          {:cont, new_pots}
+        end
+      end)
+
+    old_sum = plant_numbers(old_pots) |> Enum.sum()
+    new_sum = plant_numbers(new_pots) |> Enum.sum()
+
+    new_sum + (new_sum - old_sum) * (target - new_index)
   end
 end

@@ -78,6 +78,15 @@ defmodule Day12Test do
     end
   end
 
+  describe "part 2" do
+    test "puzzle input" do
+      assert @init_state
+             |> Day12.pots()
+             |> Day12.repeat_spread_until_find_the_pattern(@spread_notes, 50_000_000_000) ==
+               2_100_000_001_168
+    end
+  end
+
   describe "spread/2" do
     test "destroys the plant if no matches (for the examples)" do
       pots = pots('..#..')
