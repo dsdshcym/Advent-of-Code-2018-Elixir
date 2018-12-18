@@ -55,21 +55,31 @@ defmodule Day13 do
   end
 
   def tick(mine) do
-    new_carts = move_carts(mine.carts, mine.tracks)
+    case move_carts_and_detect_crash(mine.carts, mine.tracks) do
+      {:ok, moved_carts} ->
+        %{mine | carts: moved_carts}
 
-    %{mine | carts: new_carts}
+      {:crash, crashed_at} ->
+        Map.put(mine, :crashed_at, crashed_at)
+    end
   end
 
-  defp move_carts(_, _, moved_carts \\ [])
+  defp move_carts_and_detect_crash(_, _, moved_carts \\ [])
 
-  defp move_carts([], _, moved_carts) do
-    moved_carts
+  defp move_carts_and_detect_crash([], _, moved_carts) do
+    {:ok, moved_carts}
   end
 
-  defp move_carts([cart | carts_tail], tracks, moved_carts) do
+  defp move_carts_and_detect_crash([cart | carts_tail], tracks, moved_carts) do
     moved_cart = cart |> move |> turn(tracks)
 
-    move_carts(carts_tail, tracks, [moved_cart | moved_carts])
+    other_carts = carts_tail ++ moved_carts
+
+    if moved_cart.pos in Enum.map(other_carts, & &1.pos) do
+      {:crash, moved_cart.pos}
+    else
+      move_carts_and_detect_crash(carts_tail, tracks, [moved_cart | moved_carts])
+    end
   end
 
   defp move(cart) do
