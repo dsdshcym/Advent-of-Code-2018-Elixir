@@ -60,9 +60,16 @@ defmodule Day13 do
     %{mine | carts: new_carts}
   end
 
-  defp move_carts(carts, tracks) do
-    carts
-    |> Enum.map(&(&1 |> move |> turn(tracks)))
+  defp move_carts(_, _, moved_carts \\ [])
+
+  defp move_carts([], _, moved_carts) do
+    moved_carts
+  end
+
+  defp move_carts([cart | carts_tail], tracks, moved_carts) do
+    moved_cart = cart |> move |> turn(tracks)
+
+    move_carts(carts_tail, tracks, [moved_cart | moved_carts])
   end
 
   defp move(cart) do
