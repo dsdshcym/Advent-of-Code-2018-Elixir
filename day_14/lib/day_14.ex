@@ -3,7 +3,7 @@ defmodule Day14 do
   Documentation for Day14.
   """
 
-  alias Day14.Scoreboard
+  alias Day14.StringScoreboard, as: Scoreboard
 
   require Scoreboard
 
