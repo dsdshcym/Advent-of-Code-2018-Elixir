@@ -25,7 +25,7 @@ defmodule Day13 do
   end
 
   defp generate_mine(map) do
-    %{tracks: extract_tracks(map), carts: extract_carts(map)}
+    %{tracks: extract_tracks(map), carts: extract_carts(map), crashed_at: []}
   end
 
   defp extract_tracks(map) do
@@ -56,36 +56,38 @@ defmodule Day13 do
 
   def first_crash_location(mine) do
     case tick(mine) do
-      %{crashed_at: crashed_at} -> crashed_at
-      new_mine -> first_crash_location(new_mine)
+      %{crashed_at: []} = new_mine -> first_crash_location(new_mine)
+      mine -> hd(mine.crashed_at)
     end
   end
 
   def tick(mine) do
-    case move_carts_and_detect_crash(mine.carts, mine.tracks) do
-      {:ok, moved_carts} ->
-        %{mine | carts: moved_carts}
+    {moved_carts, crashes} = move_carts_and_crashes(mine.carts, mine.tracks, [], [])
 
-      {:crash, crashed_at} ->
-        Map.put(mine, :crashed_at, crashed_at)
-    end
+    mine
+    |> Map.put(:carts, moved_carts)
+    |> Map.update!(:crashed_at, &(crashes ++ &1))
   end
 
-  defp move_carts_and_detect_crash(_, _, moved_carts \\ [])
-
-  defp move_carts_and_detect_crash([], _, moved_carts) do
-    {:ok, moved_carts}
+  defp move_carts_and_crashes([], _, moved_carts, crashes) do
+    {moved_carts, crashes}
   end
 
-  defp move_carts_and_detect_crash([cart | carts_tail], tracks, moved_carts) do
+  defp move_carts_and_crashes([cart | carts_tail], tracks, moved_carts, crashes) do
     moved_cart = cart |> move |> turn(tracks)
 
-    other_carts = carts_tail ++ moved_carts
+    cond do
+      moved_cart.pos in Enum.map(carts_tail, & &1.pos) ->
+        new_carts_tail = carts_tail |> Enum.reject(&(&1.pos == moved_cart.pos))
 
-    if moved_cart.pos in Enum.map(other_carts, & &1.pos) do
-      {:crash, moved_cart.pos}
-    else
-      move_carts_and_detect_crash(carts_tail, tracks, [moved_cart | moved_carts])
+        move_carts_and_crashes(new_carts_tail, tracks, moved_carts, [moved_cart.pos | crashes])
+
+      moved_cart.pos in Enum.map(moved_carts, & &1.pos) ->
+        new_moved_carts = moved_carts |> Enum.reject(&(&1.pos == moved_cart.pos))
+        move_carts_and_crashes(carts_tail, tracks, new_moved_carts, [moved_cart.pos | crashes])
+
+      true ->
+        move_carts_and_crashes(carts_tail, tracks, [moved_cart | moved_carts], crashes)
     end
   end
 

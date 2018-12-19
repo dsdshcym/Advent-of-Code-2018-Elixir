@@ -107,19 +107,23 @@ v
     end
 
     test "crashes when top cart moves" do
-      assert %{crashed_at: {0, 1}} = "v\n^" |> Day13.parse() |> Day13.tick()
+      assert %{crashed_at: [{0, 1}]} = "v\n^" |> Day13.parse() |> Day13.tick()
     end
 
     test "crashes when bottom cart moves" do
-      assert %{crashed_at: {0, 1}} = "v\n|\n^" |> Day13.parse() |> Day13.tick()
+      assert %{crashed_at: [{0, 1}]} = "v\n|\n^" |> Day13.parse() |> Day13.tick()
     end
 
     test "crashes when left cart moves" do
-      assert %{crashed_at: {1, 0}} = "><" |> Day13.parse() |> Day13.tick()
+      assert %{crashed_at: [{1, 0}]} = "><" |> Day13.parse() |> Day13.tick()
     end
 
     test "crashes when right cart moves" do
-      assert %{crashed_at: {1, 0}} = ">-<" |> Day13.parse() |> Day13.tick()
+      assert %{crashed_at: [{1, 0}]} = ">-<" |> Day13.parse() |> Day13.tick()
+    end
+
+    test "destroys crashed carts" do
+      assert %{carts: []} = "><" |> Day13.parse() |> Day13.tick()
     end
   end
 end
