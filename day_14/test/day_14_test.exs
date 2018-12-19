@@ -44,23 +44,14 @@ defmodule Day14Test do
       scoreboard =
         Day14.iterate(new_scoreboard(recipes: %{0 => 1, 1 => 2}, player1: 0, player2: 1))
 
-      assert Day14.recipes(scoreboard) == %{
-               0 => 1,
-               1 => 2,
-               2 => 3
-             }
+      assert Day14.recipes(scoreboard) == "123"
     end
 
     test "appends recipes with the digits of the sum of the current recipes' scores" do
       scoreboard =
         Day14.iterate(new_scoreboard(recipes: %{0 => 9, 1 => 9}, player1: 0, player2: 1))
 
-      assert Day14.recipes(scoreboard) == %{
-               0 => 9,
-               1 => 9,
-               2 => 1,
-               3 => 8
-             }
+      assert Day14.recipes(scoreboard) == "9918"
     end
 
     test "steps forward players by 1 plus the score of their current recipe after recipe appendment" do

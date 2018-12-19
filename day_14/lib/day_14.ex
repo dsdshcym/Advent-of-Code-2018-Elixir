@@ -83,6 +83,6 @@ defmodule Day14 do
   end
 
   def recipes(scoreboard) do
-    scoreboard.recipes
+    scoreboard.recipes |> Map.values() |> Enum.join()
   end
 end
