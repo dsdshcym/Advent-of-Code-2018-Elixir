@@ -8,9 +8,10 @@ defmodule Day14 do
   require Scoreboard
 
   def ten_recipes_after(index) do
-    scoreboard = iterate_until(Scoreboard.initial(), index + 10)
-
-    Scoreboard.slice_recipes(scoreboard, index..(index + 10 - 1))
+    recipes()
+    |> Stream.drop(index)
+    |> Enum.take(10)
+    |> Enum.join()
   end
 
   def index_before_recipes(recipes) do
@@ -35,6 +36,17 @@ defmodule Day14 do
     end
   end
 
+  defp recipes() do
+    Stream.concat(
+      [3, 7],
+      Stream.resource(
+        &Scoreboard.initial/0,
+        &iterate_with_new_recipes/1,
+        fn _ -> :ok end
+      )
+    )
+  end
+
   def iterate_until(%{recipes: recipes} = scoreboard, target)
       when Scoreboard.enough_recipes(recipes, target) do
     scoreboard
@@ -44,6 +56,18 @@ defmodule Day14 do
     scoreboard
     |> iterate()
     |> iterate_until(target)
+  end
+
+  def iterate_with_new_recipes(scoreboard) do
+    digits =
+      Integer.digits(
+        Scoreboard.player1_recipe(scoreboard) + Scoreboard.player2_recipe(scoreboard)
+      )
+
+    {
+      digits,
+      scoreboard |> Scoreboard.append_recipe(digits) |> players_move()
+    }
   end
 
   def iterate(scoreboard) do
