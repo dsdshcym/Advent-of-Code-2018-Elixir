@@ -44,7 +44,7 @@ defmodule Day14Test do
       scoreboard =
         Day14.iterate(new_scoreboard(recipes: %{0 => 1, 1 => 2}, player1: 0, player2: 1))
 
-      assert scoreboard.recipes == %{
+      assert Day14.recipes(scoreboard) == %{
                0 => 1,
                1 => 2,
                2 => 3
@@ -55,7 +55,7 @@ defmodule Day14Test do
       scoreboard =
         Day14.iterate(new_scoreboard(recipes: %{0 => 9, 1 => 9}, player1: 0, player2: 1))
 
-      assert scoreboard.recipes == %{
+      assert Day14.recipes(scoreboard) == %{
                0 => 9,
                1 => 9,
                2 => 1,

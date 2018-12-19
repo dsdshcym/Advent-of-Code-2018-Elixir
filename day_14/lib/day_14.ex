@@ -81,4 +81,8 @@ defmodule Day14 do
     |> String.codepoints()
     |> Enum.map(&String.to_integer/1)
   end
+
+  def recipes(scoreboard) do
+    scoreboard.recipes
+  end
 end
