@@ -36,6 +36,14 @@ v
              |> Day13.first_crash_location() == {7, 3}
     end
 
+    test "top-left carts move/crash first" do
+      input = "   v\nv  |\n^  ^"
+
+      assert input
+             |> Day13.parse()
+             |> Day13.first_crash_location() == {0, 2}
+    end
+
     test "puzzle input" do
       assert @input
              |> Day13.parse()

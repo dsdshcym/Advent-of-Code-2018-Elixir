@@ -69,7 +69,8 @@ defmodule Day13 do
   end
 
   def tick(mine) do
-    {moved_carts, crashes} = move_carts_and_crashes(mine.carts, mine.tracks, [], [])
+    {moved_carts, crashes} =
+      move_carts_and_crashes(mine.carts |> Enum.sort_by(& &1.pos), mine.tracks, [], [])
 
     mine
     |> Map.put(:carts, moved_carts)
@@ -77,7 +78,7 @@ defmodule Day13 do
   end
 
   defp move_carts_and_crashes([], _, moved_carts, crashes) do
-    {moved_carts, crashes}
+    {moved_carts, Enum.reverse(crashes)}
   end
 
   defp move_carts_and_crashes([cart | carts_tail], tracks, moved_carts, crashes) do
