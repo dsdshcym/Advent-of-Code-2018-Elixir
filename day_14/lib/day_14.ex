@@ -14,10 +14,30 @@ defmodule Day14 do
     |> Enum.join()
   end
 
-  def index_before_recipes(recipes) do
-    scoreboard = iterate_until_ended_with(Scoreboard.initial(), recipes)
+  def index_before_recipes(recipes) when is_binary(recipes) do
+    recipes =
+      recipes
+      |> String.codepoints()
+      |> Enum.map(&String.to_integer/1)
 
-    Scoreboard.recipes_count(scoreboard.recipes) - String.length(recipes)
+    index_before_recipes(recipes)
+  end
+
+  def index_before_recipes(recipes) do
+    recipes()
+    |> Enum.reduce_while({recipes, recipes, 0}, fn
+      _, {[], _, index} ->
+        {:halt, index - length(recipes)}
+
+      recipe, {[recipe | rest], orig_recipes, index} ->
+        {:cont, {rest, orig_recipes, index + 1}}
+
+      recipe, {_, [recipe | rest] = orig_recipes, index} ->
+        {:cont, {rest, orig_recipes, index + 1}}
+
+      _, {_, orig_recipes, index} ->
+        {:cont, {orig_recipes, orig_recipes, index + 1}}
+    end)
   end
 
   def iterate_until_ended_with(scoreboard, recipes) do
