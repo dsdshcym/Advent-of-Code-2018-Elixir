@@ -1,14 +1,6 @@
 defmodule Day14.Scoreboard do
-  defguard enough_recipes(recipes, target) when map_size(recipes) >= target
-
   def initial() do
     %{recipes: %{0 => 3, 1 => 7}, player1: 0, player2: 1}
-  end
-
-  def slice_recipes(scoreboard, range) do
-    range
-    |> Enum.map(&scoreboard.recipes[&1])
-    |> Enum.join()
   end
 
   def recipes_count(recipes) do
@@ -33,9 +25,5 @@ defmodule Day14.Scoreboard do
     pos = recipes_count(scoreboard.recipes)
 
     put_in(scoreboard, [:recipes, pos], digit)
-  end
-
-  def recipes(scoreboard) do
-    scoreboard.recipes |> Map.values() |> Enum.join()
   end
 end
