@@ -10,6 +10,30 @@ defmodule Day14 do
     |> Enum.map(&scoreboard.recipes[&1])
   end
 
+  def index_before_recipes(recipes) do
+    scoreboard =
+      iterate_until_ended_with(%{recipes: %{0 => 3, 1 => 7}, player1: 0, player2: 1}, recipes)
+
+    map_size(scoreboard.recipes) - String.length(recipes)
+  end
+
+  def iterate_until_ended_with(scoreboard, recipes) do
+    len = String.length(recipes)
+
+    recipes_count = map_size(scoreboard.recipes)
+
+    ending =
+      (recipes_count - len)..(recipes_count - 1)
+      |> Enum.map(&scoreboard.recipes[&1])
+      |> Enum.join()
+
+    if ending == recipes do
+      scoreboard
+    else
+      iterate_until_ended_with(iterate(scoreboard), recipes)
+    end
+  end
+
   def iterate_until(%{recipes: recipes} = scoreboard, target) when map_size(recipes) >= target do
     scoreboard
   end

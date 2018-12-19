@@ -18,6 +18,20 @@ defmodule Day14Test do
     end
   end
 
+  describe "part 2" do
+    test "examples" do
+      assert Day14.index_before_recipes("51589") == 9
+      assert Day14.index_before_recipes("01245") == 5
+      assert Day14.index_before_recipes("92510") == 18
+      assert Day14.index_before_recipes("59414") == 2018
+    end
+
+    @tag skip: true
+    test "puzzle input" do
+      assert Day14.index_before_recipes("#{@input}") == 1
+    end
+  end
+
   describe "iterate_until/2" do
     test "returns scoreboard when it has more than enough recipes" do
       scoreboard = %{recipes: %{0 => 3, 1 => 7}}
