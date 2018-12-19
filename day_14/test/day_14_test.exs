@@ -31,13 +31,6 @@ defmodule Day14Test do
     end
   end
 
-  describe "iterate_until/2" do
-    test "returns scoreboard when it has more than enough recipes" do
-      scoreboard = new_scoreboard(recipes: %{0 => 3, 1 => 7}, player1: 0, player2: 1)
-      assert Day14.iterate_until(scoreboard, 1) == scoreboard
-    end
-  end
-
   describe "iterate/1" do
     test "appends recipes with the sum of the current recipes' scores (when sum is single digit)" do
       scoreboard =

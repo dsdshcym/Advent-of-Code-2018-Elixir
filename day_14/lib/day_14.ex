@@ -47,17 +47,6 @@ defmodule Day14 do
     )
   end
 
-  def iterate_until(%{recipes: recipes} = scoreboard, target)
-      when Scoreboard.enough_recipes(recipes, target) do
-    scoreboard
-  end
-
-  def iterate_until(scoreboard, target) do
-    scoreboard
-    |> iterate()
-    |> iterate_until(target)
-  end
-
   def iterate_with_new_recipes(scoreboard) do
     digits =
       Integer.digits(
