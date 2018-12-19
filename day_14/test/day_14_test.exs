@@ -6,15 +6,14 @@ defmodule Day14Test do
 
   describe "part 1" do
     test "examples" do
-      assert Day14.ten_recipes_after(9) == [5, 1, 5, 8, 9, 1, 6, 7, 7, 9]
-      assert Day14.ten_recipes_after(5) == [0, 1, 2, 4, 5, 1, 5, 8, 9, 1]
-      assert Day14.ten_recipes_after(18) == [9, 2, 5, 1, 0, 7, 1, 0, 8, 5]
-      assert Day14.ten_recipes_after(2018) == [5, 9, 4, 1, 4, 2, 9, 8, 8, 2]
+      assert Day14.ten_recipes_after(9) == "5158916779"
+      assert Day14.ten_recipes_after(5) == "0124515891"
+      assert Day14.ten_recipes_after(18) == "9251071085"
+      assert Day14.ten_recipes_after(2018) == "5941429882"
     end
 
     test "puzzle input" do
-      assert Day14.ten_recipes_after(@input)
-             |> Enum.join() == "3610281143"
+      assert Day14.ten_recipes_after(@input) == "3610281143"
     end
   end
 

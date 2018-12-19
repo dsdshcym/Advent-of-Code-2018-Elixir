@@ -3,29 +3,30 @@ defmodule Day14 do
   Documentation for Day14.
   """
 
-  def ten_recipes_after(index) do
-    scoreboard = iterate_until(%{recipes: %{0 => 3, 1 => 7}, player1: 0, player2: 1}, index + 10)
+  alias Day14.Scoreboard
 
-    index..(index + 10 - 1)
-    |> Enum.map(&scoreboard.recipes[&1])
+  require Scoreboard
+
+  def ten_recipes_after(index) do
+    scoreboard = iterate_until(Scoreboard.initial(), index + 10)
+
+    Scoreboard.slice_recipes(scoreboard, index..(index + 10 - 1))
   end
 
   def index_before_recipes(recipes) do
-    scoreboard =
-      iterate_until_ended_with(%{recipes: %{0 => 3, 1 => 7}, player1: 0, player2: 1}, recipes)
+    scoreboard = iterate_until_ended_with(Scoreboard.initial(), recipes)
 
-    map_size(scoreboard.recipes) - String.length(recipes)
+    Scoreboard.recipes_count(scoreboard.recipes) - String.length(recipes)
   end
 
   def iterate_until_ended_with(scoreboard, recipes) do
     len = String.length(recipes)
 
-    recipes_count = map_size(scoreboard.recipes)
+    recipes_count = Scoreboard.recipes_count(scoreboard.recipes)
 
     ending =
-      (recipes_count - len)..(recipes_count - 1)
-      |> Enum.map(&scoreboard.recipes[&1])
-      |> Enum.join()
+      scoreboard
+      |> Scoreboard.slice_recipes((recipes_count - len)..(recipes_count - 1))
 
     if ending == recipes do
       scoreboard
@@ -34,7 +35,8 @@ defmodule Day14 do
     end
   end
 
-  def iterate_until(%{recipes: recipes} = scoreboard, target) when map_size(recipes) >= target do
+  def iterate_until(%{recipes: recipes} = scoreboard, target)
+      when Scoreboard.enough_recipes(recipes, target) do
     scoreboard
   end
 
@@ -45,32 +47,21 @@ defmodule Day14 do
   end
 
   def iterate(scoreboard) do
-    sum = scoreboard.recipes[scoreboard.player1] + scoreboard.recipes[scoreboard.player2]
+    sum = Scoreboard.player1_recipe(scoreboard) + Scoreboard.player2_recipe(scoreboard)
 
     scoreboard
-    |> append_recipe(digits(sum))
+    |> Scoreboard.append_recipe(digits(sum))
     |> players_move()
   end
 
-  defp append_recipe(scoreboard, digits) when is_list(digits) do
-    digits
-    |> Enum.reduce(scoreboard, fn digit, scoreboard -> append_recipe(scoreboard, digit) end)
-  end
-
-  defp append_recipe(scoreboard, digit) do
-    pos = map_size(scoreboard.recipes)
-
-    put_in(scoreboard, [:recipes, pos], digit)
-  end
-
   defp players_move(scoreboard) do
-    recipes_length = map_size(scoreboard.recipes)
+    recipes_length = Scoreboard.recipes_count(scoreboard.recipes)
 
     new_player1 =
-      rem(scoreboard.player1 + scoreboard.recipes[scoreboard.player1] + 1, recipes_length)
+      rem(scoreboard.player1 + Scoreboard.player1_recipe(scoreboard) + 1, recipes_length)
 
     new_player2 =
-      rem(scoreboard.player2 + scoreboard.recipes[scoreboard.player2] + 1, recipes_length)
+      rem(scoreboard.player2 + Scoreboard.player2_recipe(scoreboard) + 1, recipes_length)
 
     %{scoreboard | player1: new_player1, player2: new_player2}
   end
@@ -83,6 +74,6 @@ defmodule Day14 do
   end
 
   def recipes(scoreboard) do
-    scoreboard.recipes |> Map.values() |> Enum.join()
+    Scoreboard.recipes(scoreboard)
   end
 end
