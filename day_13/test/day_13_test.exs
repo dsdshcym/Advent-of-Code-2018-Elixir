@@ -43,6 +43,30 @@ v
     end
   end
 
+  describe "part 2" do
+    test "long example" do
+      input = ~S[
+/>-<\
+|   |
+| /<+-\
+| | | v
+\>+</ |
+  |   ^
+  \<->/
+] |> String.trim()
+
+      assert input
+             |> Day13.parse()
+             |> Day13.last_cart_location() == {6, 4}
+    end
+
+    test "puzzle input" do
+      assert @input
+             |> Day13.parse()
+             |> Day13.last_cart_location() == {8, 7}
+    end
+  end
+
   describe "parse/1" do
     test "stores tracks in a map" do
       assert Day13.parse("/-\\").tracks == %{{0, 0} => "/", {1, 0} => "-", {2, 0} => "\\"}

@@ -61,6 +61,13 @@ defmodule Day13 do
     end
   end
 
+  def last_cart_location(mine) do
+    case tick(mine) do
+      %{carts: [last_cart]} -> last_cart.pos
+      new_mine -> last_cart_location(new_mine)
+    end
+  end
+
   def tick(mine) do
     {moved_carts, crashes} = move_carts_and_crashes(mine.carts, mine.tracks, [], [])
 
