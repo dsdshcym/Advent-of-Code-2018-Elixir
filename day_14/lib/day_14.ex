@@ -50,7 +50,7 @@ defmodule Day14 do
     sum = Scoreboard.player1_recipe(scoreboard) + Scoreboard.player2_recipe(scoreboard)
 
     scoreboard
-    |> Scoreboard.append_recipe(digits(sum))
+    |> Scoreboard.append_recipe(Integer.digits(sum))
     |> players_move()
   end
 
@@ -64,13 +64,6 @@ defmodule Day14 do
       rem(scoreboard.player2 + Scoreboard.player2_recipe(scoreboard) + 1, recipes_length)
 
     %{scoreboard | player1: new_player1, player2: new_player2}
-  end
-
-  defp digits(num) do
-    num
-    |> Integer.to_string()
-    |> String.codepoints()
-    |> Enum.map(&String.to_integer/1)
   end
 
   def recipes(scoreboard) do
