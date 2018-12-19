@@ -25,9 +25,8 @@ defmodule Day14Test do
       assert Day14.index_before_recipes("59414") == 2018
     end
 
-    @tag skip: true
     test "puzzle input" do
-      assert Day14.index_before_recipes("#{@input}") == 1
+      assert Day14.index_before_recipes("#{@input}") == 20_211_326
     end
   end
 end
