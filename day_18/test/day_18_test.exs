@@ -27,6 +27,12 @@ defmodule Day18Test do
     end
   end
 
+  describe "part 2" do
+    test "puzzle input" do
+      assert Day18.part_2(@input) == 169_024
+    end
+  end
+
   describe "parse/1" do
     test "trims input first" do
       assert Day18.parse("    ") == %{}
@@ -196,6 +202,32 @@ defmodule Day18Test do
       }
 
       assert %{{0, 0} => :lumberyard} = Day18.tick(landscape)
+    end
+  end
+
+  describe "tick_and_detect_loop/4" do
+    test "returns landscape directly if a single-item loop is detected" do
+      assert Day18.tick_and_detect_loop(%{}, 10, [%{}], fn nil -> nil end) == %{}
+    end
+
+    test "returns counted results if a multi-item loop is detected" do
+      assert Day18.tick_and_detect_loop(%{}, 1, [%{}, %{1 => nil}], fn nil -> nil end) == %{
+               1 => nil
+             }
+    end
+
+    test "cycles in the loop" do
+      assert Day18.tick_and_detect_loop(%{}, 3, [%{}, %{1 => nil}], fn nil -> nil end) == %{
+               1 => nil
+             }
+    end
+
+    test "ignores leading items out of the loop" do
+      assert Day18.tick_and_detect_loop(%{}, 3, [%{:ignored => nil}, %{}, %{1 => nil}], fn nil ->
+               nil
+             end) == %{
+               1 => nil
+             }
     end
   end
 end

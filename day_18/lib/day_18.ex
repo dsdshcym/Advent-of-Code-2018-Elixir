@@ -10,6 +10,28 @@ defmodule Day18 do
     |> resource_value()
   end
 
+  def part_2(input) do
+    input
+    |> parse()
+    |> tick_and_detect_loop(1_000_000_000)
+    |> resource_value()
+  end
+
+  def tick_and_detect_loop(landscape, minutes, known_landscapes \\ [], tick_func \\ &tick/1) do
+    if loop_start = Enum.find_index(known_landscapes, &(&1 == landscape)) do
+      loop = Enum.slice(known_landscapes, loop_start..-1)
+
+      Enum.at(loop, rem(minutes, length(loop)))
+    else
+      tick_and_detect_loop(
+        tick_func.(landscape),
+        minutes - 1,
+        known_landscapes ++ [landscape],
+        tick_func
+      )
+    end
+  end
+
   def parse(input) do
     input
     |> String.trim()
