@@ -95,7 +95,12 @@ defmodule Day18 do
     Enum.map(positions, &landscape[&1])
   end
 
-  def resource_value(_landscape) do
-    1147
+  def resource_value(landscape) do
+    acres = Map.values(landscape)
+
+    trees_count = acres |> Enum.count(&(&1 == :trees))
+    lumberyards_count = acres |> Enum.count(&(&1 == :lumberyard))
+
+    trees_count * lumberyards_count
   end
 end
