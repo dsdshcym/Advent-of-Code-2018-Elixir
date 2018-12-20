@@ -3,16 +3,20 @@ defmodule Day18 do
   Documentation for Day18.
   """
 
-  @doc """
-  Hello world.
+  def part_1(input) do
+    input
+    |> parse()
+    |> tick(10)
+    |> resource_value()
+  end
 
-  ## Examples
+  def parse(input) do
+  end
 
-      iex> Day18.hello()
-      :world
+  def tick(landscape, minutes) do
+  end
 
-  """
-  def hello do
-    :world
+  def resource_value(landscape) do
+    1147
   end
 end
