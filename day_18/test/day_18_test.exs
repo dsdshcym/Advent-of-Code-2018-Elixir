@@ -52,4 +52,19 @@ defmodule Day18Test do
              }
     end
   end
+
+  describe "tick/3" do
+    test "it returns landscape if minutes is zero" do
+      assert Day18.tick(:any_landscape, 0, fn _ -> nil end) == :any_landscape
+    end
+
+    test "it calls tick reductively minutes times" do
+      tick_fun = fn
+        :init_landscape -> :second_landscape
+        :second_landscape -> :final_landscape
+      end
+
+      assert Day18.tick(:init_landscape, 2, tick_fun) == :final_landscape
+    end
+  end
 end

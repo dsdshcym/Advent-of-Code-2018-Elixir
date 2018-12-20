@@ -28,10 +28,14 @@ defmodule Day18 do
   defp parse_acre("#"), do: :trees
   defp parse_acre("|"), do: :lumberyard
 
-  def tick(landscape, minutes) do
+  def tick(landscape, minutes, func \\ &tick/1)
+  def tick(landscape, 0, _func), do: landscape
+  def tick(landscape, minutes, func), do: landscape |> func.() |> tick(minutes - 1, func)
+
+  def tick(_landscape) do
   end
 
-  def resource_value(landscape) do
+  def resource_value(_landscape) do
     1147
   end
 end
