@@ -2,6 +2,8 @@ defmodule Day18Test do
   use ExUnit.Case
   doctest Day18
 
+  @input File.read!("./test/fixtures/puzzle_input.txt")
+
   describe "part 1" do
     test "example" do
       input = """
@@ -18,6 +20,10 @@ defmodule Day18Test do
       """
 
       assert Day18.part_1(input) == 1147
+    end
+
+    test "puzzle input" do
+      assert Day18.part_1(@input) == 583_426
     end
   end
 
