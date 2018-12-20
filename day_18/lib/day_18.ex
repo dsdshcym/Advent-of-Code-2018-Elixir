@@ -11,7 +11,22 @@ defmodule Day18 do
   end
 
   def parse(input) do
+    input
+    |> String.trim()
+    |> String.split("\n")
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {line, y} ->
+      line
+      |> String.codepoints()
+      |> Enum.with_index()
+      |> Enum.map(fn {acre, x} -> {{x, y}, parse_acre(acre)} end)
+    end)
+    |> Map.new()
   end
+
+  defp parse_acre("."), do: :open
+  defp parse_acre("#"), do: :trees
+  defp parse_acre("|"), do: :lumberyard
 
   def tick(landscape, minutes) do
   end
