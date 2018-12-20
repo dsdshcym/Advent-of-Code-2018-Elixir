@@ -30,12 +30,12 @@ defmodule Day18Test do
       assert Day18.parse(".") == %{{0, 0} => :open}
     end
 
-    test "replaces # with :trees" do
-      assert Day18.parse("#") == %{{0, 0} => :trees}
+    test "replaces | with :trees" do
+      assert Day18.parse("|") == %{{0, 0} => :trees}
     end
 
-    test "replaces | with :lumberyard" do
-      assert Day18.parse("|") == %{{0, 0} => :lumberyard}
+    test "replaces # with :lumberyard" do
+      assert Day18.parse("#") == %{{0, 0} => :lumberyard}
     end
 
     test "multiple lines" do
@@ -43,12 +43,12 @@ defmodule Day18Test do
                {0, 0} => :open,
                {1, 0} => :open,
                {2, 0} => :open,
-               {0, 1} => :trees,
-               {1, 1} => :trees,
-               {2, 1} => :trees,
-               {0, 2} => :lumberyard,
-               {1, 2} => :lumberyard,
-               {2, 2} => :lumberyard
+               {0, 1} => :lumberyard,
+               {1, 1} => :lumberyard,
+               {2, 1} => :lumberyard,
+               {0, 2} => :trees,
+               {1, 2} => :trees,
+               {2, 2} => :trees
              }
     end
   end

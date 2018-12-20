@@ -25,8 +25,8 @@ defmodule Day18 do
   end
 
   defp parse_acre("."), do: :open
-  defp parse_acre("#"), do: :trees
-  defp parse_acre("|"), do: :lumberyard
+  defp parse_acre("|"), do: :trees
+  defp parse_acre("#"), do: :lumberyard
 
   def tick(landscape, minutes, func \\ &tick/1)
   def tick(landscape, 0, _func), do: landscape
