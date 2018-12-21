@@ -51,4 +51,15 @@ defmodule Day16 do
   def possible_opcodes(sample) do
     [:mulr, :addi, :seti]
   end
+
+  def possible_opcodes(sample, funcs_by_operation) do
+    funcs_by_operation
+    |> Enum.filter(fn
+      {_operation, func} ->
+        func.(sample.before, sample.instruction) == sample.after
+    end)
+    |> Enum.map(fn
+      {operation, _func} -> operation
+    end)
+  end
 end

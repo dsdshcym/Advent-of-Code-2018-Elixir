@@ -72,4 +72,26 @@ defmodule Day16Test do
              ] = Day16.parse_samples(input)
     end
   end
+
+  describe "possible_opcodes/2" do
+    test "returns operation that returns the same results as after when given before and instruction" do
+      funcs_by_operation = %{operation: fn :before_regs, %{A: 1, B: 2, C: 3} -> :results end}
+
+      assert :operation in Day16.possible_opcodes(
+               %{before: :before_regs, instruction: %{A: 1, B: 2, C: 3}, after: :results},
+               funcs_by_operation
+             )
+    end
+
+    test "does not return operation that returns different results than after" do
+      funcs_by_operation = %{
+        operation: fn :before_regs, %{A: 1, B: 2, C: 3} -> :another_results end
+      }
+
+      assert :operation not in Day16.possible_opcodes(
+               %{before: :before_regs, instruction: %{A: 1, B: 2, C: 3}, after: :results},
+               funcs_by_operation
+             )
+    end
+  end
 end
