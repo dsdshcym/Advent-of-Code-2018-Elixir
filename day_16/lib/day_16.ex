@@ -10,13 +10,42 @@ defmodule Day16 do
   end
 
   def parse_samples(input) do
-    [
-      %{
-        before: [3, 2, 1, 1],
-        instruction: %{opcode: 9, A: 2, B: 1, C: 2},
-        after: [3, 2, 2, 1]
-      }
-    ]
+    input
+    |> String.split("\n\n")
+    |> Enum.map(&parse_sample/1)
+  end
+
+  defp parse_sample(sample_input) do
+    [reg_before, instruction, reg_after] =
+      sample_input
+      |> String.split("\n", trim: true)
+
+    "Before: " <> before_list_str = reg_before
+    "After:  " <> after_list_str = reg_after
+
+    %{
+      before: parse_list(before_list_str),
+      instruction: parse_instruction(instruction),
+      after: parse_list(after_list_str)
+    }
+  end
+
+  defp parse_list(list_str) do
+    {"[", remain_list_str} = String.split_at(list_str, 1)
+    {list_contents, "]"} = String.split_at(remain_list_str, -1)
+
+    list_contents
+    |> String.split(", ")
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  defp parse_instruction(instruction) do
+    [opcode, a, b, c] =
+      instruction
+      |> String.split(" ")
+      |> Enum.map(&String.to_integer/1)
+
+    %{opcode: opcode, A: a, B: b, C: c}
   end
 
   def possible_opcodes(sample) do
