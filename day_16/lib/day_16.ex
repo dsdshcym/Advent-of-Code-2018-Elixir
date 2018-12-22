@@ -62,4 +62,119 @@ defmodule Day16 do
       {operation, _func} -> operation
     end)
   end
+
+  import Bitwise
+
+  def default_funcs_by_operation do
+    %{
+      addr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        reg_b = Enum.at(before, instruction[:B])
+        List.replace_at(before, instruction[:C], reg_a + reg_b)
+      end,
+      addi: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        value_b = instruction[:B]
+        List.replace_at(before, instruction[:C], reg_a + value_b)
+      end,
+      mulr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        reg_b = Enum.at(before, instruction[:B])
+        List.replace_at(before, instruction[:C], reg_a * reg_b)
+      end,
+      muli: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        value_b = instruction[:B]
+        List.replace_at(before, instruction[:C], reg_a * value_b)
+      end,
+      banr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        reg_b = Enum.at(before, instruction[:B])
+        List.replace_at(before, instruction[:C], band(reg_a, reg_b))
+      end,
+      bani: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        value_b = instruction[:B]
+        List.replace_at(before, instruction[:C], band(reg_a, value_b))
+      end,
+      borr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        reg_b = Enum.at(before, instruction[:B])
+        List.replace_at(before, instruction[:C], bor(reg_a, reg_b))
+      end,
+      bori: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        value_b = instruction[:B]
+        List.replace_at(before, instruction[:C], bor(reg_a, value_b))
+      end,
+      setr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        List.replace_at(before, instruction[:C], reg_a)
+      end,
+      seti: fn before, instruction ->
+        value_a = instruction[:A]
+        List.replace_at(before, instruction[:C], value_a)
+      end,
+      gtir: fn before, instruction ->
+        value_a = instruction[:A]
+        reg_b = Enum.at(before, instruction[:B])
+
+        if value_a > reg_b do
+          List.replace_at(before, instruction[:C], 1)
+        else
+          List.replace_at(before, instruction[:C], 0)
+        end
+      end,
+      gtri: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        value_b = instruction[:B]
+
+        if reg_a > value_b do
+          List.replace_at(before, instruction[:C], 1)
+        else
+          List.replace_at(before, instruction[:C], 0)
+        end
+      end,
+      gtrr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        reg_b = Enum.at(before, instruction[:B])
+
+        if reg_a > reg_b do
+          List.replace_at(before, instruction[:C], 1)
+        else
+          List.replace_at(before, instruction[:C], 0)
+        end
+      end,
+      eqir: fn before, instruction ->
+        value_a = instruction[:A]
+        reg_b = Enum.at(before, instruction[:B])
+
+        if value_a == reg_b do
+          List.replace_at(before, instruction[:C], 1)
+        else
+          List.replace_at(before, instruction[:C], 0)
+        end
+      end,
+      eqri: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        value_b = instruction[:B]
+
+        if reg_a == value_b do
+          List.replace_at(before, instruction[:C], 1)
+        else
+          List.replace_at(before, instruction[:C], 0)
+        end
+      end,
+      eqrr: fn before, instruction ->
+        reg_a = Enum.at(before, instruction[:A])
+        reg_b = Enum.at(before, instruction[:B])
+
+        if reg_a == reg_b do
+          List.replace_at(before, instruction[:C], 1)
+        else
+          List.replace_at(before, instruction[:C], 0)
+        end
+      end
+    }
+  end
 end

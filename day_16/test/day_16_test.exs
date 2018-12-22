@@ -94,4 +94,104 @@ defmodule Day16Test do
              )
     end
   end
+
+  describe "default_funcs_by_operation/0" do
+    test ":addr stores into register C the result of adding register A and register B" do
+      assert Day16.default_funcs_by_operation()[:addr].([1, 2, 0, 0], %{A: 0, B: 1, C: 2})
+             |> Enum.at(2) == 3
+    end
+
+    test ":addi stores into register C the result of adding register A and value B" do
+      assert Day16.default_funcs_by_operation()[:addi].([1, 2, 0, 0], %{A: 0, B: 1, C: 2})
+             |> Enum.at(2) == 2
+    end
+
+    test ":mulr stores into register C the result of multiplying register A and register B" do
+      assert Day16.default_funcs_by_operation()[:mulr].([3, 4, 0, 0], %{A: 0, B: 1, C: 2})
+             |> Enum.at(2) == 12
+    end
+
+    test ":muli stores into register C the result of multiplying register A and value B." do
+      assert Day16.default_funcs_by_operation()[:muli].([3, 4, 0, 0], %{A: 0, B: 1, C: 2})
+             |> Enum.at(2) == 3
+    end
+
+    test ":banr stores into register C the result of the bitwise AND of register A and register B." do
+      assert Day16.default_funcs_by_operation()[:banr].([0, 0, 4, 6], %{A: 3, B: 2, C: 1})
+             |> Enum.at(1) == 4
+    end
+
+    test ":bani stores into register C the result of the bitwise AND of register A and value B." do
+      assert Day16.default_funcs_by_operation()[:bani].([0, 0, 4, 6], %{A: 3, B: 2, C: 1})
+             |> Enum.at(1) == 2
+    end
+
+    test ":borr stores into register C the result of the bitwise OR of register A and register B." do
+      assert Day16.default_funcs_by_operation()[:borr].([0, 0, 2, 4], %{A: 3, B: 2, C: 1})
+             |> Enum.at(1) == 6
+    end
+
+    test ":bori stores into register C the result of the bitwise OR of register A and value B." do
+      assert Day16.default_funcs_by_operation()[:bori].([0, 0, 2, 9], %{A: 3, B: 2, C: 1})
+             |> Enum.at(1) == 11
+    end
+
+    test ":setr copies the contents of register A into register C. (Input B is ignored.)" do
+      assert Day16.default_funcs_by_operation()[:setr].([0, 0, 2, 9], %{A: 3, B: nil, C: 0})
+             |> Enum.at(0) == 9
+    end
+
+    test ":seti stores value A into register C. (Input B is ignored.)" do
+      assert Day16.default_funcs_by_operation()[:seti].([0, 0, 2, 9], %{A: 3, B: nil, C: 0})
+             |> Enum.at(0) == 3
+    end
+
+    test ":gtir sets register C to 1 if value A is greater than register B. Otherwise, register C is set to 0." do
+      assert Day16.default_funcs_by_operation()[:gtir].([0, 0, 2, 9], %{A: 3, B: 2, C: 0})
+             |> Enum.at(0) == 1
+
+      assert Day16.default_funcs_by_operation()[:gtir].([1, 0, 2, 9], %{A: 3, B: 3, C: 0})
+             |> Enum.at(0) == 0
+    end
+
+    test ":gtri sets register C to 1 if register A is greater than value B. Otherwise, register C is set to 0." do
+      assert Day16.default_funcs_by_operation()[:gtri].([0, 0, 2, 3], %{A: 3, B: 2, C: 0})
+             |> Enum.at(0) == 1
+
+      assert Day16.default_funcs_by_operation()[:gtri].([1, 0, 2, 3], %{A: 3, B: 3, C: 0})
+             |> Enum.at(0) == 0
+    end
+
+    test ":gtrr sets register C to 1 if register A is greater than register B. Otherwise, register C is set to 0." do
+      assert Day16.default_funcs_by_operation()[:gtrr].([0, 0, 3, 2], %{A: 2, B: 3, C: 0})
+             |> Enum.at(0) == 1
+
+      assert Day16.default_funcs_by_operation()[:gtrr].([1, 0, 2, 3], %{A: 2, B: 3, C: 0})
+             |> Enum.at(0) == 0
+    end
+
+    test ":eqir sets register C to 1 if value A is equal to register B. Otherwise, register C is set to 0." do
+      assert Day16.default_funcs_by_operation()[:eqir].([0, 0, 3, 9], %{A: 3, B: 2, C: 0})
+             |> Enum.at(0) == 1
+
+      assert Day16.default_funcs_by_operation()[:eqir].([1, 0, 2, 9], %{A: 10, B: 3, C: 0})
+             |> Enum.at(0) == 0
+    end
+
+    test ":eqri sets register C to 1 if register A is equal to value B. Otherwise, register C is set to 0." do
+      assert Day16.default_funcs_by_operation()[:eqri].([0, 0, 7, 2], %{A: 3, B: 2, C: 0})
+             |> Enum.at(0) == 1
+
+      assert Day16.default_funcs_by_operation()[:eqri].([1, 0, 2, 9], %{A: 3, B: 3, C: 0})
+             |> Enum.at(0) == 0
+    end
+
+    test ":eqrr sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0." do
+      assert Day16.default_funcs_by_operation()[:eqrr].([0, 0, 2, 2], %{A: 2, B: 3, C: 0})
+             |> Enum.at(0) == 1
+
+      assert Day16.default_funcs_by_operation()[:eqrr].([1, 0, 2, 9], %{A: 2, B: 3, C: 0})
+             |> Enum.at(0) == 0
+    end
+  end
 end
