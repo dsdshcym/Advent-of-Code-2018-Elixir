@@ -14,6 +14,14 @@ defmodule Day16Test do
              |> Day16.possible_opcodes_for_every_sample()
              |> Enum.count(&(length(&1) >= 3)) == 1
     end
+
+    test "puzzle input" do
+      input = File.read!("./test/fixtures/samples.txt")
+
+      assert input
+             |> Day16.possible_opcodes_for_every_sample()
+             |> Enum.count(&(length(&1) >= 3)) == 521
+    end
   end
 
   describe "parse_samples/1" do
