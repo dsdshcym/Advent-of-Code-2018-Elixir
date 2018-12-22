@@ -55,6 +55,17 @@ defmodule Day16 do
     |> decide_operations(Map.put(operations_by_opcodes, decided_opcode, operation))
   end
 
+  def execute(instructions, operations_by_opcodes) do
+    instructions
+    |> String.split("\n", trim: true)
+    |> Enum.map(&parse_instruction/1)
+    |> Enum.reduce([0, 0, 0, 0], fn instruction, registers ->
+      operation = operations_by_opcodes[instruction.opcode]
+
+      default_funcs_by_operation()[operation].(registers, instruction)
+    end)
+  end
+
   def parse_samples(input) do
     input
     |> String.split("\n\n")

@@ -124,6 +124,26 @@ defmodule Day16Test do
     end
   end
 
+  describe "execute/2" do
+    test "all registers start with 0" do
+      assert Day16.execute("", %{}) == [0, 0, 0, 0]
+    end
+
+    test "single line instruction" do
+      assert Day16.execute("0 1 2 3", %{0 => :addi}) == [0, 0, 0, 2]
+    end
+
+    test "multi-line instructions" do
+      assert Day16.execute(
+               """
+               0 1 2 3
+               1 3 2 0
+               """,
+               %{0 => :addi, 1 => :addr}
+             ) == [2, 0, 0, 2]
+    end
+  end
+
   describe "parse_samples/1" do
     test "parses before list" do
       input = """
