@@ -26,6 +26,35 @@ defmodule Day16 do
     |> Map.new()
   end
 
+  def decide_operations(possible_operations_by_opcodes) do
+    possible_operations_by_opcodes
+    |> Map.to_list()
+    |> decide_operations(%{})
+  end
+
+  defp decide_operations([], operations_by_opcodes) do
+    operations_by_opcodes
+  end
+
+  defp decide_operations(possible_operations_by_opcodes, operations_by_opcodes) do
+    {decided_opcode, [operation]} =
+      possible_operations_by_opcodes
+      |> Enum.find(fn {opcode, possible_operations} -> length(possible_operations) == 1 end)
+
+    possible_operations_by_opcodes
+    |> Enum.reject(fn
+      {opcode, _} -> opcode == decided_opcode
+    end)
+    |> Enum.map(fn
+      {opcode, possible_operations} ->
+        {
+          opcode,
+          possible_operations |> Enum.reject(&(&1 == operation))
+        }
+    end)
+    |> decide_operations(Map.put(operations_by_opcodes, decided_opcode, operation))
+  end
+
   def parse_samples(input) do
     input
     |> String.split("\n\n")

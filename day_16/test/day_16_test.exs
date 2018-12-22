@@ -110,6 +110,20 @@ defmodule Day16Test do
     end
   end
 
+  describe "decide_operations/1" do
+    test "returns empty map for empty input" do
+      assert %{} = Day16.decide_operations(%{})
+    end
+
+    test "decides operation if an opcode only has one possibility" do
+      assert %{0 => :addr} = Day16.decide_operations(%{0 => [:addr]})
+    end
+
+    test "decides operation for opcode that has multiple possibilities" do
+      assert %{1 => :mulr} = Day16.decide_operations(%{0 => [:addr], 1 => [:addr, :mulr]})
+    end
+  end
+
   describe "parse_samples/1" do
     test "parses before list" do
       input = """
