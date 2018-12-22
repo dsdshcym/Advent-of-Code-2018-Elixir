@@ -24,6 +24,92 @@ defmodule Day16Test do
     end
   end
 
+  describe "possible_operations_by_opcodes/1" do
+    test "no possible operations" do
+      input = """
+      Before: [1, 2, 3, 4]
+      0 0 0 0
+      After:  [0, 0, 0, 0]
+      """
+
+      assert %{0 => []} =
+               input
+               |> Day16.possible_operations_by_opcodes()
+    end
+
+    test "one possible operation" do
+      input = """
+      Before: [1, 2, 3, 4]
+      0 0 0 0
+      After:  [2, 2, 3, 4]
+      """
+
+      assert %{0 => [:addr]} =
+               input
+               |> Day16.possible_operations_by_opcodes()
+    end
+
+    test "multiple possible operations" do
+      input = """
+      Before: [1, 2, 3, 4]
+      0 2 3 0
+      After:  [7, 2, 3, 4]
+      """
+
+      assert %{0 => [:addr, :borr]} =
+               input
+               |> Day16.possible_operations_by_opcodes()
+    end
+
+    test "returns unique results" do
+      input = """
+      Before: [1, 2, 3, 4]
+      0 0 0 0
+      After:  [2, 2, 3, 4]
+
+      Before: [1, 2, 3, 4]
+      0 0 0 0
+      After:  [2, 2, 3, 4]
+      """
+
+      assert %{0 => [:addr]} =
+               input
+               |> Day16.possible_operations_by_opcodes()
+    end
+
+    test "merges results from multiple samples" do
+      input = """
+      Before: [1, 2, 3, 4]
+      0 0 0 0
+      After:  [2, 2, 3, 4]
+
+      Before: [1, 2, 3, 4]
+      0 3 2 0
+      After:  [1, 2, 3, 4]
+      """
+
+      assert %{0 => [:addr, :eqir, :gtri, :gtrr]} =
+               input
+               |> Day16.possible_operations_by_opcodes()
+    end
+
+    test "groups results by opcode numbers" do
+      input = """
+      Before: [1, 2, 3, 4]
+      0 0 0 0
+      After:  [2, 2, 3, 4]
+
+      Before: [1, 2, 3, 4]
+      1 3 2 0
+      After:  [1, 2, 3, 4]
+      """
+
+      assert %{0 => [:addr], 1 => [:eqir, :gtri, :gtrr]} =
+               input
+               |> Day16.possible_operations_by_opcodes()
+    end
+  end
+
   describe "parse_samples/1" do
     test "parses before list" do
       input = """

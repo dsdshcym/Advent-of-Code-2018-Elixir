@@ -9,6 +9,23 @@ defmodule Day16 do
     |> Enum.map(&possible_opcodes/1)
   end
 
+  def possible_operations_by_opcodes(input) do
+    input
+    |> parse_samples()
+    |> Enum.map(&{&1.instruction[:opcode], possible_opcodes(&1)})
+    |> Enum.group_by(
+      fn {opcode, _} -> opcode end,
+      fn {_, possible_operations} -> possible_operations end
+    )
+    |> Enum.map(fn {opcode, possible_operations_groups} ->
+      {
+        opcode,
+        possible_operations_groups |> List.flatten() |> Enum.uniq()
+      }
+    end)
+    |> Map.new()
+  end
+
   def parse_samples(input) do
     input
     |> String.split("\n\n")
