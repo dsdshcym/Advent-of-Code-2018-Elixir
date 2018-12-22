@@ -48,11 +48,7 @@ defmodule Day16 do
     %{opcode: opcode, A: a, B: b, C: c}
   end
 
-  def possible_opcodes(sample) do
-    [:mulr, :addi, :seti]
-  end
-
-  def possible_opcodes(sample, funcs_by_operation) do
+  def possible_opcodes(sample, funcs_by_operation \\ default_funcs_by_operation()) do
     funcs_by_operation
     |> Enum.filter(fn
       {_operation, func} ->
