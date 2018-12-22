@@ -24,6 +24,21 @@ defmodule Day16Test do
     end
   end
 
+  describe "part 2" do
+    test "puzzle input" do
+      samples = File.read!("./test/fixtures/samples.txt")
+
+      operations =
+        samples
+        |> Day16.possible_operations_by_opcodes()
+        |> Day16.decide_operations()
+
+      test_program = File.read!("./test/fixtures/test_program.txt")
+
+      assert [594 | _] = Day16.execute(test_program, operations)
+    end
+  end
+
   describe "possible_operations_by_opcodes/1" do
     test "no possible operations" do
       input = """
