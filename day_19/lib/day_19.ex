@@ -43,7 +43,18 @@ defmodule Day19 do
     end)
   end
 
+  def execute_until_ip_is_out_of_bounds(%{ip_register: ip_register, program: program} = state)
+      when ip_register >= length(program) do
+    state
+  end
+
   def execute_until_ip_is_out_of_bounds(state) do
-    %{registers: [6, 5, 6, 0, 0, 9]}
+    state
+    |> execute()
+    |> execute_until_ip_is_out_of_bounds()
+  end
+
+  def execute(state) do
+    %{state | ip_register: 7, registers: [6, 5, 6, 0, 0, 9]}
   end
 end
