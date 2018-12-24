@@ -79,12 +79,12 @@ defmodule Day19Test do
 
   describe "execute_until_ip_is_out_of_bounds/1" do
     test "returns state immediately if ip is equal to or larger than program length" do
-      state = %{ip_register: 1, program: [:any_program]}
+      state = %{ip: 1, program: [:any_program]}
 
       assert Day19.execute_until_ip_is_out_of_bounds(state) == state
     end
 
-    test "executes until ip_register is out of bounds" do
+    test "executes until ip is out of bounds" do
       init_state = %{
         ip_register: 0,
         ip: 0,
@@ -100,7 +100,7 @@ defmodule Day19Test do
         registers: [0, 0, 0, 0, 0, 0]
       }
 
-      assert %{ip_register: 7, registers: [6, 5, 6, 0, 0, 9]} =
+      assert %{ip: 7, registers: [6, 5, 6, 0, 0, 9]} =
                Day19.execute_until_ip_is_out_of_bounds(init_state)
     end
   end

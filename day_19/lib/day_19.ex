@@ -45,8 +45,8 @@ defmodule Day19 do
     end)
   end
 
-  def execute_until_ip_is_out_of_bounds(%{ip_register: ip_register, program: program} = state)
-      when ip_register >= length(program) do
+  def execute_until_ip_is_out_of_bounds(%{ip: ip, program: program} = state)
+      when ip >= length(program) do
     state
   end
 
