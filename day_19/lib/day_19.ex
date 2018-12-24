@@ -12,17 +12,17 @@ defmodule Day19 do
     |> execute_until_ip_is_out_of_bounds()
   end
 
-  def parse_input(input) do
+  def parse_input(input, initial_registers \\ @initial_registers) do
     input
     |> String.split("\n", trim: true)
-    |> do_parse_input()
+    |> do_parse_input(initial_registers)
   end
 
-  defp do_parse_input([ip_line | program_lines]) do
+  defp do_parse_input([ip_line | program_lines], initial_registers) do
     %{
       ip_register: parse_ip(ip_line),
       program: parse_program(program_lines),
-      registers: @initial_registers,
+      registers: initial_registers,
       ip: @initial_ip
     }
   end
