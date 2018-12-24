@@ -3,26 +3,44 @@ defmodule Day19 do
   Documentation for Day19.
   """
 
+  @initial_registers [0, 0, 0, 0, 0, 0]
+
   def part_1(input) do
     input
     |> parse_input()
     |> execute_until_ip_is_out_of_bounds()
   end
 
-  def parse_input(_input) do
+  def parse_input(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> do_parse_input()
+  end
+
+  defp do_parse_input([ip_line | program_lines]) do
     %{
-      ip_register: 0,
-      program: [
-        %{operation: :seti, A: 5, B: 0, C: 1},
-        %{operation: :seti, A: 6, B: 0, C: 2},
-        %{operation: :addi, A: 0, B: 1, C: 0},
-        %{operation: :addr, A: 1, B: 2, C: 3},
-        %{operation: :setr, A: 1, B: 0, C: 0},
-        %{operation: :seti, A: 8, B: 0, C: 4},
-        %{operation: :seti, A: 9, B: 0, C: 5}
-      ],
-      registers: [0, 0, 0, 0, 0, 0]
+      ip_register: parse_ip(ip_line),
+      program: parse_program(program_lines),
+      registers: @initial_registers
     }
+  end
+
+  defp parse_ip("#ip " <> ip_register_str) do
+    String.to_integer(ip_register_str)
+  end
+
+  defp parse_program(program_lines) do
+    program_lines
+    |> Enum.map(fn line ->
+      [operation, a, b, c] = String.split(line, " ")
+
+      %{
+        operation: String.to_atom(operation),
+        A: String.to_integer(a),
+        B: String.to_integer(b),
+        C: String.to_integer(c)
+      }
+    end)
   end
 
   def execute_until_ip_is_out_of_bounds(state) do
