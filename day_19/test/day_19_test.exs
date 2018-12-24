@@ -43,6 +43,10 @@ defmodule Day19Test do
       assert %{registers: [0, 0, 0, 0, 0, 0]} = Day19.parse_input("#ip 0")
     end
 
+    test "sets ip to 0" do
+      assert %{ip: 0} = Day19.parse_input("#ip 2")
+    end
+
     test "example input" do
       input = """
       #ip 0
@@ -67,7 +71,8 @@ defmodule Day19Test do
                    %{operation: :seti, A: 8, B: 0, C: 4},
                    %{operation: :seti, A: 9, B: 0, C: 5}
                  ],
-                 registers: [0, 0, 0, 0, 0, 0]
+                 registers: [0, 0, 0, 0, 0, 0],
+                 ip: 0
                }
     end
   end
@@ -82,6 +87,7 @@ defmodule Day19Test do
     test "executes until ip_register is out of bounds" do
       init_state = %{
         ip_register: 0,
+        ip: 0,
         program: [
           %{operation: :seti, A: 5, B: 0, C: 1},
           %{operation: :seti, A: 6, B: 0, C: 2},

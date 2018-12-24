@@ -4,6 +4,7 @@ defmodule Day19 do
   """
 
   @initial_registers [0, 0, 0, 0, 0, 0]
+  @initial_ip 0
 
   def part_1(input) do
     input
@@ -21,7 +22,8 @@ defmodule Day19 do
     %{
       ip_register: parse_ip(ip_line),
       program: parse_program(program_lines),
-      registers: @initial_registers
+      registers: @initial_registers,
+      ip: @initial_ip
     }
   end
 
