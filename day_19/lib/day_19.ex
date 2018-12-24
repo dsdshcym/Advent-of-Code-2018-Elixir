@@ -57,6 +57,20 @@ defmodule Day19 do
   end
 
   def execute(state) do
-    %{state | ip_register: 7, registers: [6, 5, 6, 0, 0, 9]}
+    state
+    |> Map.update!(:registers, fn registers ->
+      List.replace_at(registers, state.ip_register, state.ip)
+    end)
+    |> Map.update!(:registers, fn registers ->
+      instruction = Enum.at(state.program, state.ip)
+
+      Day16.default_funcs_by_operation()[instruction.operation].(registers, instruction)
+    end)
+    |> update_ip()
+  end
+
+  defp update_ip(state) do
+    state
+    |> Map.replace!(:ip, Enum.at(state.registers, state.ip_register) + 1)
   end
 end

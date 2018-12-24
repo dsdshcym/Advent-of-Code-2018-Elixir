@@ -104,4 +104,46 @@ defmodule Day19Test do
                Day19.execute_until_ip_is_out_of_bounds(init_state)
     end
   end
+
+  describe "execute/1" do
+    test "sets the ip_register to ip first" do
+      assert %{registers: [_, 0]} =
+               Day19.execute(%{
+                 ip_register: 1,
+                 ip: 0,
+                 program: [%{operation: :seti, A: 5, B: 5, C: 0}],
+                 registers: [0, 9]
+               })
+    end
+
+    test "executes the instruction ip points to" do
+      assert %{registers: [2, _ip_register]} =
+               Day19.execute(%{
+                 ip_register: 1,
+                 ip: 0,
+                 program: [%{operation: :seti, A: 2, B: 5, C: 0}],
+                 registers: [0, 0]
+               })
+    end
+
+    test "sets ip to the value of ip_register after the execution and increased by 1" do
+      assert %{ip: 3} =
+               Day19.execute(%{
+                 ip_register: 0,
+                 ip: 0,
+                 program: [%{operation: :seti, A: 2, B: nil, C: 0}],
+                 registers: [0, 0]
+               })
+    end
+
+    test "does not modify state.program" do
+      assert %{program: [%{operation: :seti, A: 2, B: nil, C: 0}]} =
+               Day19.execute(%{
+                 ip_register: 0,
+                 ip: 0,
+                 program: [%{operation: :seti, A: 2, B: nil, C: 0}],
+                 registers: [0, 0]
+               })
+    end
+  end
 end
