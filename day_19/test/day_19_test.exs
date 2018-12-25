@@ -63,6 +63,18 @@ defmodule Day19Test do
     end
   end
 
+  describe "part 2" do
+    @tag skip: true
+    test "puzzle input" do
+      # The sum of all factors of 10551319
+      # for i <- 1..10551319, rem(10551319, i) == 0, do: i
+      # [1, 23, 79, 1817, 5807, 133561, 458753, 10551319]
+      # Enum.sum(v)
+      # 11151360
+      assert %{registers: [11_151_360 | _]} = Day19.part_2(@puzzle_input)
+    end
+  end
+
   describe "parse_input/1" do
     test "sets ip_register based on line 1" do
       assert %{ip_register: 3} = Day19.parse_input("#ip 3")

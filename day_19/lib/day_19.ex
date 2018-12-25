@@ -12,6 +12,12 @@ defmodule Day19 do
     |> execute_until_ip_is_out_of_bounds()
   end
 
+  def part_2(input) do
+    input
+    |> parse_input([1, 0, 0, 0, 0, 0])
+    |> execute_until_ip_is_out_of_bounds()
+  end
+
   def parse_input(input, initial_registers \\ @initial_registers) do
     input
     |> String.split("\n", trim: true)
