@@ -3,6 +3,12 @@ defmodule Day20 do
   Documentation for Day20.
   """
 
+  def part_1(input) do
+    input
+    |> parse_input()
+    |> build_map()
+    |> furthest_distance({0, 0})
+  end
 
   def parse_input(string) do
     path_size = byte_size(string) - 2
