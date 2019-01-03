@@ -119,4 +119,12 @@ defmodule Day20Test do
       assert Day20.furthest_distance(map, {0, 0}) == 1
     end
   end
+
+  describe "distances_to_other_nodes/2" do
+    test "only two nodes" do
+      map = %{{0, 0} => MapSet.new([{0, 1}]), {0, 1} => MapSet.new([{0, 0}])}
+
+      assert Day20.distances_to_other_nodes(map, {0, 0}) == %{{0, 0} => 0, {0, 1} => 1}
+    end
+  end
 end

@@ -131,4 +131,31 @@ defmodule Day20 do
       furthest_distance(map, next_nodes, visited_nodes, current_distance + 1)
     end
   end
+
+  def distances_to_other_nodes(map, start) do
+    distances_to_other_nodes(map, MapSet.new([start]), %{start => 0}, 0)
+  end
+
+  def distances_to_other_nodes(map, current_nodes, distances, current_distance) do
+    if MapSet.size(current_nodes) == 0 do
+      distances
+    else
+      new_distances =
+        current_nodes
+        |> Enum.map(&{&1, current_distance})
+        |> Map.new()
+        |> Map.merge(distances)
+
+      visited_nodes = new_distances |> Map.keys() |> MapSet.new()
+
+      current_neighbors =
+        current_nodes
+        |> Enum.map(&Map.fetch!(map, &1))
+        |> Enum.reduce(&MapSet.union/2)
+
+      next_nodes = MapSet.difference(current_neighbors, visited_nodes)
+
+      distances_to_other_nodes(map, next_nodes, new_distances, current_distance + 1)
+    end
+  end
 end
