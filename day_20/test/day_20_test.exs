@@ -90,4 +90,12 @@ defmodule Day20Test do
              }
     end
   end
+
+  describe "furthest_distance/2" do
+    test "returns 1 if only one neighbor" do
+      map = %{{0, 0} => MapSet.new([{0, 1}]), {0, 1} => MapSet.new([{0, 0}])}
+
+      assert Day20.furthest_distance(map, {0, 0}) == 1
+    end
+  end
 end

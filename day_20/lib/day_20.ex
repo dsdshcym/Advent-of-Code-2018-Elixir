@@ -104,4 +104,25 @@ defmodule Day20 do
     |> Map.update(node1, MapSet.new([node2]), &MapSet.put(&1, node2))
     |> Map.update(node2, MapSet.new([node1]), &MapSet.put(&1, node1))
   end
+
+  def furthest_distance(map, start) do
+    furthest_distance(map, MapSet.new([start]), MapSet.new(), 0)
+  end
+
+  defp furthest_distance(map, current_nodes, visited_nodes, current_distance) do
+    if MapSet.size(current_nodes) == 0 do
+      current_distance - 1
+    else
+      visited_nodes = MapSet.union(current_nodes, visited_nodes)
+
+      current_neighbors =
+        current_nodes
+        |> Enum.map(&Map.fetch!(map, &1))
+        |> Enum.reduce(&MapSet.union/2)
+
+      next_nodes = MapSet.difference(current_neighbors, visited_nodes)
+
+      furthest_distance(map, next_nodes, visited_nodes, current_distance + 1)
+    end
+  end
 end
