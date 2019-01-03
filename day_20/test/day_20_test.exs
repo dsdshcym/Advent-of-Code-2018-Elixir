@@ -24,6 +24,12 @@ defmodule Day20Test do
     end
   end
 
+  describe "part_2/1" do
+    test "puzzle input" do
+      assert Day20.part_2(@puzzle_input) == 8809
+    end
+  end
+
   describe "parse_input/1" do
     test "ignores ^ and $" do
       assert Day20.parse_input("^$") == []

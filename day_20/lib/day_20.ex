@@ -10,6 +10,13 @@ defmodule Day20 do
     |> furthest_distance({0, 0})
   end
 
+  def part_2(input) do
+    input
+    |> parse_input()
+    |> build_map()
+    |> distances_at_least({0, 0}, 1000)
+  end
+
   def parse_input(string) do
     path_size = byte_size(string) - 2
 
@@ -143,5 +150,12 @@ defmodule Day20 do
 
       distances_to_other_nodes(map, next_nodes, new_distances, current_distance + 1)
     end
+  end
+
+  def distances_at_least(map, start, limit) do
+    map
+    |> distances_to_other_nodes(start)
+    |> Map.values()
+    |> Enum.count(&(&1 >= limit))
   end
 end
