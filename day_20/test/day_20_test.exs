@@ -50,4 +50,44 @@ defmodule Day20Test do
              ]
     end
   end
+
+  describe "build_map/1" do
+    test "returns empty map if no routes" do
+      assert Day20.build_map([]) == %{}
+    end
+
+    test "returns neighbors info" do
+      assert Day20.build_map([:north]) == %{
+               {0, 0} => MapSet.new([{0, 1}]),
+               {0, 1} => MapSet.new([{0, 0}])
+             }
+    end
+
+    test "handles branches" do
+      assert Day20.build_map([[[:north], [:south]]]) == %{
+               {0, 0} => MapSet.new([{0, 1}, {0, -1}]),
+               {0, 1} => MapSet.new([{0, 0}]),
+               {0, -1} => MapSet.new([{0, 0}])
+             }
+    end
+
+    test "moves from different start after branches" do
+      assert Day20.build_map([[[:north], [:south]], :west]) == %{
+               {0, 0} => MapSet.new([{0, 1}, {0, -1}]),
+               {0, 1} => MapSet.new([{0, 0}, {-1, 1}]),
+               {0, -1} => MapSet.new([{0, 0}, {-1, -1}]),
+               {-1, 1} => MapSet.new([{0, 1}]),
+               {-1, -1} => MapSet.new([{0, -1}])
+             }
+    end
+
+    test "handles empty branch" do
+      assert Day20.build_map([[[:north], []], :west]) == %{
+               {0, 0} => MapSet.new([{0, 1}, {-1, 0}]),
+               {0, 1} => MapSet.new([{0, 0}, {-1, 1}]),
+               {-1, 0} => MapSet.new([{0, 0}]),
+               {-1, 1} => MapSet.new([{0, 1}])
+             }
+    end
+  end
 end

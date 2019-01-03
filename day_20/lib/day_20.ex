@@ -47,4 +47,61 @@ defmodule Day20 do
   defp parse_path("", acc, [], []) do
     Enum.reverse(acc)
   end
+
+  def build_map(routes) do
+    {_, map} = build_map(routes, MapSet.new([{0, 0}]), %{})
+
+    map
+  end
+
+  defp build_map([], current_positions, map), do: {current_positions, map}
+
+  defp build_map([direction | rest], current_positions, map) when is_atom(direction) do
+    {new_positions, new_map} =
+      current_positions
+      |> Enum.map_reduce(
+        map,
+        fn pos, map ->
+          next_pos = move(pos, direction)
+          new_map = add_edge(map, pos, next_pos)
+
+          {next_pos, new_map}
+        end
+      )
+
+    build_map(rest, MapSet.new(new_positions), new_map)
+  end
+
+  defp build_map([branches | rest], current_positions, map) when is_list(branches) do
+    {new_positions, new_map} =
+      branches
+      |> Enum.map(&build_map(&1, current_positions, map))
+      |> Enum.reduce(fn
+        {positions1, map1}, {positions2, map2} ->
+          {merge_positions(positions1, positions2), merge_maps(map1, map2)}
+      end)
+
+    build_map(rest, new_positions, new_map)
+  end
+
+  defp merge_positions(positions1, positions2) do
+    MapSet.union(positions1, positions2)
+  end
+
+  defp merge_maps(map1, map2) do
+    Map.merge(map1, map2, fn _node, neighbors1, neighbors2 ->
+      MapSet.union(neighbors1, neighbors2)
+    end)
+  end
+
+  defp move({x, y}, :north), do: {x, y + 1}
+  defp move({x, y}, :south), do: {x, y - 1}
+  defp move({x, y}, :east), do: {x + 1, y}
+  defp move({x, y}, :west), do: {x - 1, y}
+
+  defp add_edge(map, node1, node2) do
+    map
+    |> Map.update(node1, MapSet.new([node2]), &MapSet.put(&1, node2))
+    |> Map.update(node2, MapSet.new([node1]), &MapSet.put(&1, node1))
+  end
 end
