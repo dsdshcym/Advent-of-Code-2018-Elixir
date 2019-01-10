@@ -11,14 +11,4 @@ defmodule Day22Test do
       assert Day22.part_1(4848, {15, 700}) == 11359
     end
   end
-
-  describe "risk_level/3" do
-    test "examples" do
-      assert Day22.risk_level(510, {0, 0}, {10, 10}) == 0
-      assert Day22.risk_level(510, {1, 0}, {10, 10}) == 1
-      assert Day22.risk_level(510, {0, 1}, {10, 10}) == 0
-      assert Day22.risk_level(510, {1, 1}, {10, 10}) == 2
-      assert Day22.risk_level(510, {10, 10}, {10, 10}) == 0
-    end
-  end
 end
