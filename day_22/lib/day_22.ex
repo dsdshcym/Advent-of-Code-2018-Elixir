@@ -12,19 +12,19 @@ defmodule Day22 do
   end
 
   def build_cave(depth, {max_x, max_y} = target) do
-    erosion_levels =
-      for x <- 0..max_x,
-          y <- 0..max_y,
-          coordinates = {x, y},
-          erosion_level = erosion_level(depth, coordinates, target),
-          do: {coordinates, erosion_level},
-          into: %{}
-
-    %{
-      erosion_levels: erosion_levels,
-      depth: depth,
-      target: target
-    }
+    for x <- 0..max_x, y <- 0..max_y do
+      {x, y}
+    end
+    |> Enum.reduce(
+      %{
+        erosion_levels: %{},
+        depth: depth,
+        target: target
+      },
+      fn coordinates, cave ->
+        put_in(cave.erosion_levels[coordinates], erosion_level(cave, coordinates))
+      end
+    )
   end
 
   def risk_level(erosion_level) do
@@ -46,6 +46,10 @@ defmodule Day22 do
       1 -> :wet
       2 -> :narrow
     end
+  end
+
+  defp erosion_level(cave, coordinates) do
+    erosion_level(cave.depth, coordinates, cave.target)
   end
 
   defp erosion_level(depth, coordinates, target) do
