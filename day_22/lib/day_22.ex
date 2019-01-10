@@ -1,13 +1,22 @@
 defmodule Day22 do
   def part_1(depth, target) do
-    sum_of_risk_levels_in_rectangle(depth, {0, 0}, target)
+    build_cave(depth, target)
+    |> sum_of_risk_levels_in_rectangle()
   end
 
-  def sum_of_risk_levels_in_rectangle(depth, {x1, y1} = _top_left, {x2, y2} = bottom_right) do
-    for x <- x1..x2, y <- y1..y2, coordinates = {x, y} do
-      risk_level(depth, coordinates, bottom_right)
-    end
+  def sum_of_risk_levels_in_rectangle(cave) do
+    cave
+    |> Map.values()
     |> Enum.sum()
+  end
+
+  def build_cave(depth, {max_x, max_y} = target) do
+    for x <- 0..max_x,
+        y <- 0..max_y,
+        coordinates = {x, y},
+        risk_level = risk_level(depth, coordinates, target),
+        do: {coordinates, risk_level},
+        into: %{}
   end
 
   def risk_level(depth, coordinates, target) do
