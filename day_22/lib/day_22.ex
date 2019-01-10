@@ -14,21 +14,26 @@ defmodule Day22 do
     for x <- 0..max_x,
         y <- 0..max_y,
         coordinates = {x, y},
-        risk_level = risk_level(depth, coordinates, target),
+        risk_level = risk_level(erosion_level(depth, coordinates, target)),
         do: {coordinates, risk_level},
         into: %{}
   end
 
+  def risk_level(erosion_level) do
+    risk_level_for_region_type(region_type(erosion_level))
+  end
+
   def risk_level(depth, coordinates, target) do
-    risk_level_for_region_type(region_type(depth, coordinates, target))
+    erosion_level(depth, coordinates, target)
+    |> risk_level
   end
 
   defp risk_level_for_region_type(:rocky), do: 0
   defp risk_level_for_region_type(:wet), do: 1
   defp risk_level_for_region_type(:narrow), do: 2
 
-  defp region_type(depth, coordinates, target) do
-    case rem(erosion_level(depth, coordinates, target), 3) do
+  defp region_type(erosion_level) do
+    case rem(erosion_level, 3) do
       0 -> :rocky
       1 -> :wet
       2 -> :narrow
