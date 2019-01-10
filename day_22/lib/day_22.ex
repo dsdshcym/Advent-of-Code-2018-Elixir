@@ -7,6 +7,7 @@ defmodule Day22 do
   def sum_of_risk_levels_in_rectangle(cave) do
     cave
     |> Map.values()
+    |> Enum.map(&risk_level/1)
     |> Enum.sum()
   end
 
@@ -14,8 +15,8 @@ defmodule Day22 do
     for x <- 0..max_x,
         y <- 0..max_y,
         coordinates = {x, y},
-        risk_level = risk_level(erosion_level(depth, coordinates, target)),
-        do: {coordinates, risk_level},
+        erosion_level = erosion_level(depth, coordinates, target),
+        do: {coordinates, erosion_level},
         into: %{}
   end
 
