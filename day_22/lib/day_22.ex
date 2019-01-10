@@ -49,7 +49,10 @@ defmodule Day22 do
   end
 
   defp erosion_level(cave, coordinates) do
-    rem(geologic_index(cave, coordinates) + cave.depth, 20183)
+    case cave.erosion_levels do
+      %{^coordinates => erosion_level} -> erosion_level
+      %{} -> rem(geologic_index(cave, coordinates) + cave.depth, 20183)
+    end
   end
 
   defp erosion_level(depth, coordinates, target) do
