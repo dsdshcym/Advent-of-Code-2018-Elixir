@@ -38,30 +38,21 @@ defmodule Day22 do
     end
   end
 
-  def part_1(depth, target) do
-    build_cave(depth, target)
-    |> sum_of_risk_levels_in_rectangle()
-  end
-
-  def sum_of_risk_levels_in_rectangle(cave) do
-    cave.erosion_levels
-    |> Map.values()
-    |> Enum.map(&risk_level/1)
-    |> Enum.sum()
-  end
-
-  def build_cave(depth, {max_x, max_y} = target) do
-    for x <- 0..max_x, y <- 0..max_y do
-      {x, y}
-    end
-    |> Enum.reduce(
-      Cave.create(depth, target),
-      fn coordinates, cave ->
-        {cave, _erosion_level} = Cave.erosion_level(cave, coordinates)
-
-        cave
+  def part_1(depth, {max_x, max_y} = target) do
+    {risk_levels, _cave} =
+      for x <- 0..max_x, y <- 0..max_y do
+        {x, y}
       end
-    )
+      |> Enum.map_reduce(
+        Cave.create(depth, target),
+        fn coordinates, cave ->
+          {cave, erosion_level} = Cave.erosion_level(cave, coordinates)
+
+          {risk_level(erosion_level), cave}
+        end
+      )
+
+    Enum.sum(risk_levels)
   end
 
   def risk_level(erosion_level) do
