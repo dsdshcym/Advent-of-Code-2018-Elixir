@@ -8,6 +8,19 @@ defmodule Day22 do
       }
     end
 
+    def find_or_insert_erosion_level(cave, coordinates) do
+      case cave.erosion_levels do
+        %{^coordinates => erosion_level} ->
+          {cave, erosion_level}
+
+        %{} ->
+          erosion_level = rem(geologic_index(cave, coordinates) + cave.depth, 20183)
+          new_cave = put_in(cave.erosion_levels[coordinates], erosion_level)
+
+          {new_cave, erosion_level}
+      end
+    end
+
     def erosion_level(cave, coordinates) do
       case cave.erosion_levels do
         %{^coordinates => erosion_level} -> erosion_level
@@ -43,7 +56,9 @@ defmodule Day22 do
     |> Enum.reduce(
       Cave.create(depth, target),
       fn coordinates, cave ->
-        put_in(cave.erosion_levels[coordinates], Cave.erosion_level(cave, coordinates))
+        {cave, _erosion_level} = Cave.find_or_insert_erosion_level(cave, coordinates)
+
+        cave
       end
     )
   end
