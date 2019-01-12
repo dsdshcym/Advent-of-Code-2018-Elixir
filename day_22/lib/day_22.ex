@@ -95,4 +95,139 @@ defmodule Day22 do
     end
     |> Enum.sum()
   end
+
+  def part_2(depth, target) do
+    cave = Cave.create(depth, target)
+
+    climber = %{
+      tool: :torch,
+      coordinates: {0, 0}
+    }
+
+    search(cave, climber, target)
+  end
+
+  defp search(cave, init_climber, target) do
+    bfs_search(cave, [{0, [init_climber]}], target, [])
+  end
+
+  defp bfs_search(cave, [{current_minute, current_climbers} | tail], target, visited) do
+    climbers_at_target =
+      current_climbers
+      |> Enum.filter(&(&1.coordinates == target))
+
+    case climbers_at_target do
+      [] ->
+        visited = visited ++ current_climbers
+
+        next_climbers_by_minute =
+          current_climbers
+          |> Enum.flat_map(fn climber ->
+            climber
+            |> climb(cave)
+            |> Enum.map(fn {time_cost, next_climber} ->
+              {current_minute + time_cost, next_climber}
+            end)
+          end)
+          |> Enum.reject(fn {minute, climber} -> climber in visited end)
+
+        new_climbers_by_minute_queue =
+          next_climbers_by_minute
+          |> Enum.reduce(tail, &insert_into_queue/2)
+
+        bfs_search(cave, new_climbers_by_minute_queue, target, visited)
+
+      [climber | _] ->
+        if climber.tool == :torch do
+          current_minute
+        else
+          current_minute + 7
+        end
+    end
+  end
+
+  defp climb(climber, cave) do
+    climber
+    |> adjacent_regions()
+    |> Enum.map(&climb_to(climber, &1, cave))
+    |> Enum.filter(&(&1 != nil))
+  end
+
+  defp adjacent_regions(%{coordinates: {x, y}}) do
+    [
+      {x - 1, y},
+      {x + 1, y},
+      {x, y - 1},
+      {x, y + 1}
+    ]
+  end
+
+  defp climb_to(climber, to, cave) when is_tuple(to) do
+    from_region = Cave.region_type(cave, climber.coordinates)
+    to_region = Cave.region_type(cave, to)
+
+    if to_region == :solid_rock do
+      nil
+    else
+      case {from_region, to_region, climber.tool} do
+        {:rocky, :wet, :climbing_gear} ->
+          {1, %{climber | coordinates: to}}
+
+        {:rocky, :wet, :torch} ->
+          {8, %{climber | tool: :climbing_gear, coordinates: to}}
+
+        {:rocky, :narrow, :climbing_gear} ->
+          {8, %{climber | tool: :torch, coordinates: to}}
+
+        {:rocky, :narrow, :torch} ->
+          {1, %{climber | coordinates: to}}
+
+        {:wet, :rocky, :climbing_gear} ->
+          {1, %{climber | coordinates: to}}
+
+        {:wet, :rocky, :neither} ->
+          {8, %{climber | tool: :climbing_gear, coordinates: to}}
+
+        {:wet, :narrow, :climbing_gear} ->
+          {8, %{climber | tool: :neither, coordinates: to}}
+
+        {:wet, :narrow, :neither} ->
+          {1, %{climber | coordinates: to}}
+
+        {:narrow, :rocky, :torch} ->
+          {1, %{climber | coordinates: to}}
+
+        {:narrow, :rocky, :neither} ->
+          {8, %{climber | tool: :torch, coordinates: to}}
+
+        {:narrow, :wet, :torch} ->
+          {8, %{climber | tool: :neither, coordinates: to}}
+
+        {:narrow, :wet, :neither} ->
+          {1, %{climber | coordinates: to}}
+
+        {from_region, to_region, _} when from_region == to_region ->
+          {1, %{climber | coordinates: to}}
+      end
+    end
+  end
+
+  defp insert_into_queue({minute, climber}, []) do
+    [{minute, [climber]}]
+  end
+
+  defp insert_into_queue({minute, climber}, [{head_minute, _head_climbers} = head | tail])
+       when head_minute < minute do
+    [head | insert_into_queue({minute, climber}, tail)]
+  end
+
+  defp insert_into_queue({minute, climber}, [{head_minute, head_climbers} | tail])
+       when head_minute == minute do
+    [{head_minute, [climber | head_climbers]} | tail]
+  end
+
+  defp insert_into_queue({minute, climber}, [{head_minute, _head_climbers} | _tail] = queue)
+       when head_minute > minute do
+    [{minute, [climber]} | queue]
+  end
 end
