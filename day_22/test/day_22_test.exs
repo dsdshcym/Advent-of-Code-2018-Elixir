@@ -17,9 +17,8 @@ defmodule Day22Test do
       assert Day22.part_2(510, {10, 10}) == 45
     end
 
-    @tag skip: true
     test "puzzle input" do
-      assert Day22.part_2(4848, {15, 700}) == 11359
+      assert Day22.part_2(4848, {15, 700}) == 976
     end
   end
 end

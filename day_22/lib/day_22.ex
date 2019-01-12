@@ -108,42 +108,52 @@ defmodule Day22 do
   end
 
   defp search(cave, init_climber, target) do
-    bfs_search(cave, [{0, MapSet.new([init_climber])}], target, MapSet.new())
+    bfs_search(cave, [{0, MapSet.new([init_climber])}], target, MapSet.new(), nil)
   end
 
-  defp bfs_search(cave, [{current_minute, current_climbers} | tail], target, visited) do
-    climbers_at_target =
+  defp bfs_search(
+         _cave,
+         [{current_minute, _current_climbers} | _tail],
+         _target,
+         _visited,
+         min_minutes
+       )
+       when is_integer(min_minutes) and current_minute > min_minutes do
+    min_minutes
+  end
+
+  defp bfs_search(cave, [{current_minute, current_climbers} | tail], target, visited, min_minutes) do
+    min_minutes =
       current_climbers
       |> Enum.filter(&(&1.coordinates == target))
-
-    case climbers_at_target do
-      [] ->
-        visited = MapSet.union(visited, current_climbers)
-
-        next_climbers_by_minute =
-          current_climbers
-          |> Enum.flat_map(fn climber ->
-            climber
-            |> climb(cave)
-            |> Enum.map(fn {time_cost, next_climber} ->
-              {current_minute + time_cost, next_climber}
-            end)
-          end)
-          |> Enum.reject(fn {minute, climber} -> climber in visited end)
-
-        new_climbers_by_minute_queue =
-          next_climbers_by_minute
-          |> Enum.reduce(tail, &insert_into_queue/2)
-
-        bfs_search(cave, new_climbers_by_minute_queue, target, visited)
-
-      [climber | _] ->
+      |> Enum.map(fn climber ->
         if climber.tool == :torch do
           current_minute
         else
           current_minute + 7
         end
-    end
+      end)
+      |> List.insert_at(0, min_minutes)
+      |> Enum.min()
+
+    visited = MapSet.union(visited, current_climbers)
+
+    next_climbers_by_minute =
+      current_climbers
+      |> Enum.flat_map(fn climber ->
+        climber
+        |> climb(cave)
+        |> Enum.map(fn {time_cost, next_climber} ->
+          {current_minute + time_cost, next_climber}
+        end)
+      end)
+      |> Enum.reject(fn {_minute, climber} -> climber in visited end)
+
+    new_climbers_by_minute_queue =
+      next_climbers_by_minute
+      |> Enum.reduce(tail, &insert_into_queue/2)
+
+    bfs_search(cave, new_climbers_by_minute_queue, target, visited, min_minutes)
   end
 
   defp climb(climber, cave) do
