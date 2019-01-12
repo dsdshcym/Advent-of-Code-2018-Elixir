@@ -22,8 +22,15 @@ defmodule Day22 do
       end
     end
 
-    def risk_level(erosion_level) do
-      risk_level_for_region_type(region_type(erosion_level))
+    def risk_level(cave, coordinates) do
+      {new_cave, erosion_level} = erosion_level(cave, coordinates)
+
+      risk_level =
+        erosion_level
+        |> region_type()
+        |> risk_level_for_region_type()
+
+      {new_cave, risk_level}
     end
 
     defp risk_level_for_region_type(:rocky), do: 0
@@ -62,9 +69,9 @@ defmodule Day22 do
       |> Enum.map_reduce(
         Cave.create(depth, target),
         fn coordinates, cave ->
-          {cave, erosion_level} = Cave.erosion_level(cave, coordinates)
+          {cave, risk_level} = Cave.risk_level(cave, coordinates)
 
-          {Cave.risk_level(erosion_level), cave}
+          {risk_level, cave}
         end
       )
 
