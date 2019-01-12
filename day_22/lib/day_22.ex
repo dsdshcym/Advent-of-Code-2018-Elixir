@@ -1,4 +1,29 @@
 defmodule Day22 do
+  defmodule Cave do
+    def create(depth, target) do
+      %{
+        erosion_levels: %{},
+        depth: depth,
+        target: target
+      }
+    end
+
+    def erosion_level(cave, coordinates) do
+      case cave.erosion_levels do
+        %{^coordinates => erosion_level} -> erosion_level
+        %{} -> rem(geologic_index(cave, coordinates) + cave.depth, 20183)
+      end
+    end
+
+    defp geologic_index(_cave, {0, 0}), do: 0
+    defp geologic_index(%{target: target}, coordinates) when coordinates == target, do: 0
+    defp geologic_index(_cave, {x, 0}), do: x * 16807
+    defp geologic_index(_cave, {0, y}), do: y * 48271
+
+    defp geologic_index(cave, {x, y}),
+      do: erosion_level(cave, {x - 1, y}) * erosion_level(cave, {x, y - 1})
+  end
+
   def part_1(depth, target) do
     build_cave(depth, target)
     |> sum_of_risk_levels_in_rectangle()
@@ -16,13 +41,9 @@ defmodule Day22 do
       {x, y}
     end
     |> Enum.reduce(
-      %{
-        erosion_levels: %{},
-        depth: depth,
-        target: target
-      },
+      Cave.create(depth, target),
       fn coordinates, cave ->
-        put_in(cave.erosion_levels[coordinates], erosion_level(cave, coordinates))
+        put_in(cave.erosion_levels[coordinates], Cave.erosion_level(cave, coordinates))
       end
     )
   end
@@ -42,19 +63,4 @@ defmodule Day22 do
       2 -> :narrow
     end
   end
-
-  defp erosion_level(cave, coordinates) do
-    case cave.erosion_levels do
-      %{^coordinates => erosion_level} -> erosion_level
-      %{} -> rem(geologic_index(cave, coordinates) + cave.depth, 20183)
-    end
-  end
-
-  defp geologic_index(_cave, {0, 0}), do: 0
-  defp geologic_index(%{target: target}, coordinates) when coordinates == target, do: 0
-  defp geologic_index(_cave, {x, 0}), do: x * 16807
-  defp geologic_index(_cave, {0, y}), do: y * 48271
-
-  defp geologic_index(cave, {x, y}),
-    do: erosion_level(cave, {x - 1, y}) * erosion_level(cave, {x, y - 1})
 end
