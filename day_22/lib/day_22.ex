@@ -22,13 +22,6 @@ defmodule Day22 do
       end
     end
 
-    def erosion_level(cave, coordinates) do
-      case cave.erosion_levels do
-        %{^coordinates => erosion_level} -> erosion_level
-        %{} -> rem(geologic_index(cave, coordinates) + cave.depth, 20183)
-      end
-    end
-
     defp geologic_index(cave, {0, 0}), do: {cave, 0}
 
     defp geologic_index(%{target: target} = cave, coordinates) when coordinates == target,
