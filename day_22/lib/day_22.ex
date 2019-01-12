@@ -11,7 +11,13 @@ defmodule Day22 do
     end
 
     def risk_level(cave, coordinates) do
-      GenServer.call(cave, {:risk_level, coordinates})
+      cave
+      |> region_type(coordinates)
+      |> risk_level_for_region_type()
+    end
+
+    def region_type(cave, coordinates) do
+      GenServer.call(cave, {:region_type, coordinates})
     end
 
     # Server
@@ -25,15 +31,14 @@ defmodule Day22 do
        }}
     end
 
-    def handle_call({:risk_level, coordinates}, _from, cave) do
+    def handle_call({:region_type, coordinates}, _from, cave) do
       {new_cave, erosion_level} = erosion_level(cave, coordinates)
 
-      risk_level =
+      region_type =
         erosion_level
         |> region_type()
-        |> risk_level_for_region_type()
 
-      {:reply, risk_level, new_cave}
+      {:reply, region_type, new_cave}
     end
 
     defp erosion_level(cave, coordinates) do
