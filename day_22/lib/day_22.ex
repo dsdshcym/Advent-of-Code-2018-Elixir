@@ -108,7 +108,7 @@ defmodule Day22 do
   end
 
   defp search(cave, init_climber, target) do
-    bfs_search(cave, [{0, [init_climber]}], target, [])
+    bfs_search(cave, [{0, MapSet.new([init_climber])}], target, MapSet.new())
   end
 
   defp bfs_search(cave, [{current_minute, current_climbers} | tail], target, visited) do
@@ -118,7 +118,7 @@ defmodule Day22 do
 
     case climbers_at_target do
       [] ->
-        visited = visited ++ current_climbers
+        visited = MapSet.union(visited, current_climbers)
 
         next_climbers_by_minute =
           current_climbers
@@ -213,7 +213,7 @@ defmodule Day22 do
   end
 
   defp insert_into_queue({minute, climber}, []) do
-    [{minute, [climber]}]
+    [{minute, MapSet.new([climber])}]
   end
 
   defp insert_into_queue({minute, climber}, [{head_minute, _head_climbers} = head | tail])
@@ -223,11 +223,11 @@ defmodule Day22 do
 
   defp insert_into_queue({minute, climber}, [{head_minute, head_climbers} | tail])
        when head_minute == minute do
-    [{head_minute, [climber | head_climbers]} | tail]
+    [{head_minute, MapSet.put(head_climbers, climber)} | tail]
   end
 
   defp insert_into_queue({minute, climber}, [{head_minute, _head_climbers} | _tail] = queue)
        when head_minute > minute do
-    [{minute, [climber]} | queue]
+    [{minute, MapSet.new([climber])} | queue]
   end
 end
