@@ -8,7 +8,7 @@ defmodule Day22 do
       }
     end
 
-    def find_or_insert_erosion_level(cave, coordinates) do
+    def erosion_level(cave, coordinates) do
       case cave.erosion_levels do
         %{^coordinates => erosion_level} ->
           {cave, erosion_level}
@@ -31,8 +31,8 @@ defmodule Day22 do
     defp geologic_index(cave, {0, y}), do: {cave, y * 48271}
 
     defp geologic_index(cave, {x, y}) do
-      {cave, erosion_level_1} = find_or_insert_erosion_level(cave, {x - 1, y})
-      {cave, erosion_level_2} = find_or_insert_erosion_level(cave, {x, y - 1})
+      {cave, erosion_level_1} = erosion_level(cave, {x - 1, y})
+      {cave, erosion_level_2} = erosion_level(cave, {x, y - 1})
 
       {cave, erosion_level_1 * erosion_level_2}
     end
@@ -57,7 +57,7 @@ defmodule Day22 do
     |> Enum.reduce(
       Cave.create(depth, target),
       fn coordinates, cave ->
-        {cave, _erosion_level} = Cave.find_or_insert_erosion_level(cave, coordinates)
+        {cave, _erosion_level} = Cave.erosion_level(cave, coordinates)
 
         cave
       end
