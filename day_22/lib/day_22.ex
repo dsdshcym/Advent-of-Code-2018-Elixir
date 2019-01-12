@@ -1,11 +1,39 @@
 defmodule Day22 do
   defmodule Cave do
+    use GenServer
+
+    # Client
+
     def create(depth, target) do
-      %{
-        erosion_levels: %{},
-        depth: depth,
-        target: target
-      }
+      {:ok, cave} = GenServer.start_link(__MODULE__, %{depth: depth, target: target})
+
+      cave
+    end
+
+    def risk_level(cave, coordinates) do
+      GenServer.call(cave, {:risk_level, coordinates})
+    end
+
+    # Server
+
+    def init(%{depth: depth, target: target}) do
+      {:ok,
+       %{
+         erosion_levels: %{},
+         depth: depth,
+         target: target
+       }}
+    end
+
+    def handle_call({:risk_level, coordinates}, _from, cave) do
+      {new_cave, erosion_level} = erosion_level(cave, coordinates)
+
+      risk_level =
+        erosion_level
+        |> region_type()
+        |> risk_level_for_region_type()
+
+      {:reply, risk_level, new_cave}
     end
 
     defp erosion_level(cave, coordinates) do
@@ -20,17 +48,6 @@ defmodule Day22 do
 
           {new_cave, erosion_level}
       end
-    end
-
-    def risk_level(cave, coordinates) do
-      {new_cave, erosion_level} = erosion_level(cave, coordinates)
-
-      risk_level =
-        erosion_level
-        |> region_type()
-        |> risk_level_for_region_type()
-
-      {new_cave, risk_level}
     end
 
     defp risk_level_for_region_type(:rocky), do: 0
@@ -62,19 +79,11 @@ defmodule Day22 do
   end
 
   def part_1(depth, {max_x, max_y} = target) do
-    {risk_levels, _cave} =
-      for x <- 0..max_x, y <- 0..max_y do
-        {x, y}
-      end
-      |> Enum.map_reduce(
-        Cave.create(depth, target),
-        fn coordinates, cave ->
-          {cave, risk_level} = Cave.risk_level(cave, coordinates)
+    cave = Cave.create(depth, target)
 
-          {risk_level, cave}
-        end
-      )
-
-    Enum.sum(risk_levels)
+    for x <- 0..max_x, y <- 0..max_y do
+      Cave.risk_level(cave, {x, y})
+    end
+    |> Enum.sum()
   end
 end
