@@ -8,7 +8,7 @@ defmodule Day22 do
       }
     end
 
-    def erosion_level(cave, coordinates) do
+    defp erosion_level(cave, coordinates) do
       case cave.erosion_levels do
         %{^coordinates => erosion_level} ->
           {cave, erosion_level}
