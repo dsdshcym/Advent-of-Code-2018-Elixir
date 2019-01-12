@@ -31,6 +31,10 @@ defmodule Day22 do
        }}
     end
 
+    def handle_call({:region_type, {x, y}}, _from, cave) when x < 0 or y < 0 do
+      {:reply, :solid_rock, cave}
+    end
+
     def handle_call({:region_type, coordinates}, _from, cave) do
       {new_cave, erosion_level} = erosion_level(cave, coordinates)
 
