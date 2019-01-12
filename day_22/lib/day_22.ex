@@ -22,6 +22,22 @@ defmodule Day22 do
       end
     end
 
+    def risk_level(erosion_level) do
+      risk_level_for_region_type(region_type(erosion_level))
+    end
+
+    defp risk_level_for_region_type(:rocky), do: 0
+    defp risk_level_for_region_type(:wet), do: 1
+    defp risk_level_for_region_type(:narrow), do: 2
+
+    defp region_type(erosion_level) do
+      case rem(erosion_level, 3) do
+        0 -> :rocky
+        1 -> :wet
+        2 -> :narrow
+      end
+    end
+
     defp geologic_index(cave, {0, 0}), do: {cave, 0}
 
     defp geologic_index(%{target: target} = cave, coordinates) when coordinates == target,
@@ -48,26 +64,10 @@ defmodule Day22 do
         fn coordinates, cave ->
           {cave, erosion_level} = Cave.erosion_level(cave, coordinates)
 
-          {risk_level(erosion_level), cave}
+          {Cave.risk_level(erosion_level), cave}
         end
       )
 
     Enum.sum(risk_levels)
-  end
-
-  def risk_level(erosion_level) do
-    risk_level_for_region_type(region_type(erosion_level))
-  end
-
-  defp risk_level_for_region_type(:rocky), do: 0
-  defp risk_level_for_region_type(:wet), do: 1
-  defp risk_level_for_region_type(:narrow), do: 2
-
-  defp region_type(erosion_level) do
-    case rem(erosion_level, 3) do
-      0 -> :rocky
-      1 -> :wet
-      2 -> :narrow
-    end
   end
 end
