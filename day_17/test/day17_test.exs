@@ -24,4 +24,25 @@ defmodule Day17Test do
       assert Day17.part_1(@puzzle_input) == 39557
     end
   end
+
+  describe "part 2" do
+    test "example" do
+      input = """
+      x=495, y=2..7
+      y=7, x=495..501
+      x=501, y=3..7
+      x=498, y=2..4
+      x=506, y=1..2
+      x=498, y=10..13
+      x=504, y=10..13
+      y=13, x=498..504
+      """
+
+      assert Day17.part_2(input) == 29
+    end
+
+    test "puzzle input" do
+      assert Day17.part_2(@puzzle_input) == 32984
+    end
+  end
 end

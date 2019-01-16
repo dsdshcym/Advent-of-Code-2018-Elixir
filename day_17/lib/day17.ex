@@ -6,6 +6,13 @@ defmodule Day17 do
     |> tiles_count_by_element_type([:flow, :still])
   end
 
+  def part_2(input) do
+    input
+    |> build_ground()
+    |> fill_water()
+    |> tiles_count_by_element_type([:still])
+  end
+
   defp build_ground(input) do
     state =
       input
