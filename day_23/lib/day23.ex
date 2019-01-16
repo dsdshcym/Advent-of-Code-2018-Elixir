@@ -45,10 +45,11 @@ defmodule Day23 do
     manhattan_distance(bot1, bot2) <= bot1.r
   end
 
-  defp manhattan_distance(bot1, bot2) do
-    {x1, y1, z1} = bot1.coordinates
-    {x2, y2, z2} = bot2.coordinates
-
+  defp manhattan_distance({x1, y1, z1}, {x2, y2, z2}) do
     abs(x1 - x2) + abs(y1 - y2) + abs(z1 - z2)
+  end
+
+  defp manhattan_distance(bot1, bot2) do
+    manhattan_distance(bot1.coordinates, bot2.coordinates)
   end
 end
