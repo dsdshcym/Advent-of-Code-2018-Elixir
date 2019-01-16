@@ -3,7 +3,7 @@ defmodule Day17 do
     input
     |> build_ground()
     |> fill_water()
-    |> water_tiles_count()
+    |> tiles_count_by_element_type([:flow, :still])
   end
 
   defp build_ground(input) do
@@ -127,15 +127,10 @@ defmodule Day17 do
     {x + 1, y}
   end
 
-  defp water_tiles_count(ground) do
-    ground
-    |> water_tiles_between_top_and_bottom()
-    |> Enum.count()
-  end
-
-  defp water_tiles_between_top_and_bottom(ground) do
+  defp tiles_count_by_element_type(ground, types) do
     ground.state
-    |> Enum.filter(fn {_pos, element} -> element in [:still, :flow] end)
+    |> Enum.filter(fn {_pos, element} -> element in types end)
     |> Enum.filter(fn {{_, y}, _} -> y >= ground.top and y <= ground.bottom end)
+    |> Enum.count()
   end
 end
