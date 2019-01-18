@@ -151,4 +151,73 @@ defmodule Day24Test do
                )
     end
   end
+
+  describe "combat/1" do
+    test "example" do
+      assert Day24.combat(%{
+               immune_system: [
+                 %{
+                   units: 17,
+                   hp_per_unit: 5390,
+                   weaknesses: [:radiation, :bludgeoning],
+                   immunities: [],
+                   attack_damage: 4507,
+                   attack_type: :fire,
+                   initiative: 2
+                 },
+                 %{
+                   units: 989,
+                   hp_per_unit: 1274,
+                   weaknesses: [:bludgeoning, :slashing],
+                   immunities: [:fire],
+                   attack_damage: 25,
+                   attack_type: :slashing,
+                   initiative: 3
+                 }
+               ],
+               infection: [
+                 %{
+                   units: 801,
+                   hp_per_unit: 4706,
+                   weaknesses: [:radiation],
+                   immunities: [],
+                   attack_damage: 116,
+                   attack_type: :bludgeoning,
+                   initiative: 1
+                 },
+                 %{
+                   units: 4485,
+                   hp_per_unit: 2961,
+                   weaknesses: [:fire, :cold],
+                   immunities: [:radiation],
+                   attack_damage: 12,
+                   attack_type: :slashing,
+                   initiative: 4
+                 }
+               ]
+             }) ==
+               [
+                 %{
+                   army: :infection,
+                   attack_damage: 116,
+                   attack_type: :bludgeoning,
+                   hp_per_unit: 4706,
+                   immunities: [],
+                   initiative: 1,
+                   units: 782,
+                   weaknesses: [:radiation]
+                 },
+                 %{
+                   army: :infection,
+                   attack_damage: 12,
+                   attack_type: :slashing,
+                   hp_per_unit: 2961,
+                   immunities: [:radiation],
+                   initiative: 4,
+                   units: 4434,
+                   weaknesses: [:fire, :cold]
+                 }
+               ]
+    end
+  end
 end

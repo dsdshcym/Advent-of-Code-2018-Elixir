@@ -90,30 +90,144 @@ defmodule Day24 do
     end
   end
 
-  def combat(_init_state) do
-    %{
-      immune_system: [],
-      infection: [
-        %{
-          units: 782,
-          hp_per_unit: 4706,
-          weaknesses: [:radiation],
-          immunities: [],
-          attack_damage: 116,
-          attack_type: :bludgeoning,
-          initiative: 1
-        },
-        %{
-          units: 4434,
-          hp_per_unit: 2961,
-          weaknesses: [:fire, :cold],
-          immunities: [:radiation],
-          attack_damage: 12,
-          attack_type: :slashing,
-          initiative: 4
-        }
-      ]
-    }
+  def combat(init_state) do
+    init_state =
+      Enum.map(init_state.immune_system, &Map.put(&1, :army, :immune_system)) ++
+        Enum.map(init_state.infection, &Map.put(&1, :army, :infection))
+
+    fight_until_one_army_left(init_state)
+  end
+
+  def fight_until_one_army_left(state) do
+    if only_one_army_left?(state) do
+      state
+    else
+      defenders_by_attacker = state |> target_selection_phase
+      updated_state = attacking_phase(state, defenders_by_attacker)
+      fight_until_one_army_left(updated_state)
+    end
+  end
+
+  defp only_one_army_left?(state) do
+    1 ==
+      state
+      |> Enum.map(& &1.army)
+      |> Enum.uniq()
+      |> Enum.count()
+  end
+
+  def target_selection_phase(state) do
+    state
+    |> sort_by_descending_order_of_effective_power_and_initiative()
+    |> Enum.reduce(%{}, fn attacker, defenders_by_attacker ->
+      state
+      |> enemy_groups_of(attacker)
+      |> not_chosen_as_target_yet(defenders_by_attacker)
+      |> Enum.group_by(&full_damage(attacker, &1))
+      |> Enum.max_by(
+        fn {full_damage, _potential_targets} -> full_damage end,
+        fn -> {nil, []} end
+      )
+      |> case do
+        {_, []} ->
+          defenders_by_attacker
+
+        {_, potential_targets} ->
+          [target | _] =
+            potential_targets
+            |> sort_by_descending_order_of_effective_power_and_initiative()
+
+          Map.put(defenders_by_attacker, attacker.initiative, target.initiative)
+      end
+    end)
+  end
+
+  def attacking_phase(state, defenders_by_attacker) do
+    defenders_by_attacker
+    |> Enum.sort_by(
+      fn {attacker_initiative, _defender_initiative} -> attacker_initiative end,
+      &>/2
+    )
+    |> Enum.reduce(state, fn {attacker_initiative, defender_initiative}, state ->
+      attack(state, attacker_initiative, defender_initiative)
+    end)
+  end
+
+  defp attack(state, attacker_initiative, defender_initiative) do
+    attacker = find_by_initiative(state, attacker_initiative)
+    defender = find_by_initiative(state, defender_initiative)
+
+    update_group(state, defender_initiative, attack(attacker, defender))
+  end
+
+  defp attack(attacker, defender) do
+    full_damage = full_damage(attacker, defender)
+    killed_units = Enum.min([defender.units, div(full_damage, defender.hp_per_unit)])
+    remained_units = defender.units - killed_units
+    %{defender | units: remained_units}
+  end
+
+  defp update_group(state, group_initiative, %{units: 0}) do
+    old_group = find_by_initiative(state, group_initiative)
+
+    state
+    |> List.delete(old_group)
+  end
+
+  defp update_group(state, group_initiative, new_group) do
+    old_group = find_by_initiative(state, group_initiative)
+
+    [
+      new_group
+      | state
+        |> List.delete(old_group)
+    ]
+  end
+
+  defp find_by_initiative(state, initiative) do
+    state
+    |> Enum.find(&(&1.initiative == initiative))
+  end
+
+  defp enemy_groups_of(groups, group) do
+    groups
+    |> Enum.filter(&enemy?(&1.army, group.army))
+  end
+
+  defp not_chosen_as_target_yet(groups, defenders_by_attacker) do
+    defender_initiatives = Map.values(defenders_by_attacker)
+
+    groups
+    |> Enum.reject(&(&1.initiative in defender_initiatives))
+  end
+
+  defp full_damage(attacker, defender) do
+    cond do
+      immune_to?(defender, attacker) -> 0
+      weak_to?(defender, attacker) -> effective_power(attacker) * 2
+      true -> effective_power(attacker)
+    end
+  end
+
+  defp immune_to?(defender, attacker) do
+    attacker.attack_type in defender.immunities
+  end
+
+  defp weak_to?(defender, attacker) do
+    attacker.attack_type in defender.weaknesses
+  end
+
+  defp enemy?(:immune_system, :infection), do: true
+  defp enemy?(:infection, :immune_system), do: true
+  defp enemy?(_, _), do: false
+
+  defp sort_by_descending_order_of_effective_power_and_initiative(groups) do
+    groups
+    |> Enum.sort_by(&{effective_power(&1), &1.initiative}, &>/2)
+  end
+
+  defp effective_power(group) do
+    group.units * group.attack_damage
   end
 
   def winning_army_units_count(_state) do
