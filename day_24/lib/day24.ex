@@ -11,19 +11,19 @@ defmodule Day24 do
       input
       |> String.split("\n\n")
 
-    %{
-      immune_system: parse_groups(immune_system_input),
-      infection: parse_groups(infection_input)
-    }
+    Map.new(
+      parse_groups(immune_system_input, :immune_system) ++
+        parse_groups(infection_input, :infection)
+    )
   end
 
-  defp parse_groups(lines) do
+  defp parse_groups(lines, army) do
     lines
     |> String.split("\n", trim: true)
-    |> Enum.map(&parse_group/1)
+    |> Enum.map(&parse_group(&1, army))
   end
 
-  def parse_group(line) do
+  def parse_group(line, army) do
     %{
       "units" => units,
       "hp_per_unit" => hp_per_unit,
@@ -40,14 +40,18 @@ defmodule Day24 do
     %{weaknesses: weaknesses, immunities: immunities} =
       parse_weaknesses_and_immunities(weaknesses_or_immunities)
 
-    %{
-      units: String.to_integer(units),
-      hp_per_unit: String.to_integer(hp_per_unit),
-      weaknesses: weaknesses,
-      immunities: immunities,
-      attack_damage: String.to_integer(attack_damage),
-      attack_type: String.to_atom(attack_type),
-      initiative: String.to_integer(initiative)
+    {
+      String.to_integer(initiative),
+      %{
+        units: String.to_integer(units),
+        hp_per_unit: String.to_integer(hp_per_unit),
+        weaknesses: weaknesses,
+        immunities: immunities,
+        attack_damage: String.to_integer(attack_damage),
+        attack_type: String.to_atom(attack_type),
+        initiative: String.to_integer(initiative),
+        army: army
+      }
     }
   end
 
@@ -91,10 +95,6 @@ defmodule Day24 do
   end
 
   def combat(init_state) do
-    init_state =
-      Enum.map(init_state.immune_system, &Map.put(&1, :army, :immune_system)) ++
-        Enum.map(init_state.infection, &Map.put(&1, :army, :infection))
-
     fight_until_one_army_left(init_state)
   end
 
@@ -111,6 +111,7 @@ defmodule Day24 do
   defp only_one_army_left?(state) do
     1 ==
       state
+      |> groups()
       |> Enum.map(& &1.army)
       |> Enum.uniq()
       |> Enum.count()
@@ -118,6 +119,7 @@ defmodule Day24 do
 
   def target_selection_phase(state) do
     state
+    |> groups()
     |> sort_by_descending_order_of_effective_power_and_initiative()
     |> Enum.reduce(%{}, fn attacker, defenders_by_attacker ->
       state
@@ -171,29 +173,24 @@ defmodule Day24 do
   end
 
   defp update_group(state, group_initiative, %{units: 0}) do
-    old_group = find_by_initiative(state, group_initiative)
+    {_, new_state} =
+      state
+      |> Map.pop(group_initiative)
 
-    state
-    |> List.delete(old_group)
+    new_state
   end
 
   defp update_group(state, group_initiative, new_group) do
-    old_group = find_by_initiative(state, group_initiative)
-
-    [
-      new_group
-      | state
-        |> List.delete(old_group)
-    ]
+    Map.put(state, group_initiative, new_group)
   end
 
   defp find_by_initiative(state, initiative) do
-    state
-    |> Enum.find(&(&1.initiative == initiative))
+    state[initiative]
   end
 
   defp enemy_groups_of(groups, group) do
     groups
+    |> groups()
     |> Enum.filter(&enemy?(&1.army, group.army))
   end
 
@@ -224,6 +221,10 @@ defmodule Day24 do
   defp enemy?(:infection, :immune_system), do: true
   defp enemy?(_, _), do: false
 
+  defp groups(state) do
+    Map.values(state)
+  end
+
   defp sort_by_descending_order_of_effective_power_and_initiative(groups) do
     groups
     |> Enum.sort_by(&{effective_power(&1), &1.initiative}, &>/2)
@@ -235,6 +236,7 @@ defmodule Day24 do
 
   def winning_army_units_count(state) do
     state
+    |> groups()
     |> Enum.map(& &1.units)
     |> Enum.sum()
   end
