@@ -230,7 +230,9 @@ defmodule Day24 do
     group.units * group.attack_damage
   end
 
-  def winning_army_units_count(_state) do
-    5216
+  def winning_army_units_count(state) do
+    state
+    |> Enum.map(& &1.units)
+    |> Enum.sum()
   end
 end
