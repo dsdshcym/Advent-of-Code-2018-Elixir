@@ -124,6 +124,7 @@ defmodule Day24 do
       |> enemy_groups_of(attacker)
       |> not_chosen_as_target_yet(defenders_by_attacker)
       |> Enum.group_by(&full_damage(attacker, &1))
+      |> Enum.reject(fn {full_damage, _} -> full_damage == 0 end)
       |> Enum.max_by(
         fn {full_damage, _potential_targets} -> full_damage end,
         fn -> {nil, []} end
