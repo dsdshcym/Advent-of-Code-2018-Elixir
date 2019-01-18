@@ -154,10 +154,12 @@ defmodule Day24 do
   end
 
   defp attack(state, attacker_initiative, defender_initiative) do
-    attacker = find_by_initiative(state, attacker_initiative)
-    defender = find_by_initiative(state, defender_initiative)
-
-    update_group(state, defender_initiative, attack(attacker, defender))
+    with attacker when not is_nil(attacker) <- find_by_initiative(state, attacker_initiative),
+         defender when not is_nil(defender) <- find_by_initiative(state, defender_initiative) do
+      update_group(state, defender_initiative, attack(attacker, defender))
+    else
+      nil -> state
+    end
   end
 
   defp attack(attacker, defender) do
